@@ -1,7 +1,7 @@
 # Waldo CLI
 
 [![License](https://img.shields.io/badge/license-Commercial-lightgrey.svg?style=flat)][commercial license]
-[![Platform](https://img.shields.io/github/release/waldoapp/WaldoCLI.svg?style=flat)][release]
+[![Release](https://img.shields.io/github/release/waldoapp/waldocli.svg?style=flat)][release]
 
 * [Overview](#overview)
 * [Requirements](#requirements)
