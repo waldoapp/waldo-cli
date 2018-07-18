@@ -5,7 +5,11 @@ is based on [Keep a Changelog].
 
 This project adheres to [Semantic Versioning].
 
-## Unreleased
+## 0.20.0 - 2018-07-18
+
+### Added
+
+- This and that.
 
 ## 0.19.2 - 2018-07-18
 
