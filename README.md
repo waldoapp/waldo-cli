@@ -21,8 +21,9 @@ Waldo backend for processing.
 
 ## <a name="installation">Installation</a>
 
-The Waldo CLI is distributed as an installation package. Simply download the
-appropriate installation package from [here] and double-click it.
+The Waldo CLI is distributed as an installation package. Simply download and
+run the `WaldoCLI-x.y.z.pkg` file for the latest [release], then follow the
+on-screen instructions.
 
 When the installation completes, you should find that a single executable named
 `waldo` has been installed into `/usr/local/bin`. You can can confirm this with
@@ -49,7 +50,9 @@ $ rm -f /usr/local/bin/waldo
 
 ## <a name="usage">Usage</a>
 
-Typically, you will run the Waldo CLI from a build phase in your Xcode project.
+Typically, you will invoke the `waldo upload` command from a build phase in
+your Xcode project in conjunction with a configuration file.
+
 See ??? for details.
 
 ## <a name="credits">Credits</a>
@@ -61,4 +64,4 @@ Your friends at Waldo (info@waldo.io)
 The Waldo CLI is available under [commercial license].
 
 [commercial license]:   https://github.com/waldoapp/WaldoCLI/blob/master/LICENSE.md
-[here]:                 https://github.com/waldoapp/WaldoCLI/releases
+[release]:              https://github.com/waldoapp/WaldoCLI/releases
