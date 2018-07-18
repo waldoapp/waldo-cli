@@ -1,3 +1,43 @@
-# 0.19.0 (2018-07-16)
+# Changelog
 
-Another pre-release.
+All notable changes to this project will be documented in this file. The format
+is based on [Keep a Changelog].
+
+This project adheres to [Semantic Versioning].
+
+## Unreleased
+
+## 0.19.2 - 2018-07-18
+
+### Added
+
+- More stuff.
+
+## 0.19.0 - 2018-07-16
+
+### Added
+
+- Stuff.
+
+### Changed
+
+- Other stuff.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Can’t remember.
+
+### Fixed
+
+- Everything.
+
+### Security
+
+- Yep.
+
+[Keep a Changelog]:     https://keepachangelog.com
+[Semantic Versioning]:  https://semver.org
