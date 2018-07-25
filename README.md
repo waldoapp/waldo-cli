@@ -34,7 +34,7 @@ $ which waldo
 /usr/local/bin/waldo
 ```
 
-You can also verify that the Waldo CLI is correctly installed:
+You can also verify that the Waldo CLI is correctly installed with this command:
 
 ```
 $ waldo version
@@ -50,10 +50,10 @@ $ rm -f /usr/local/bin/waldo
 
 ## <a name="usage">Usage</a>
 
-Typically, you will invoke the `waldo upload` command from a build phase in
-your Xcode project in conjunction with a configuration file.
+Typically, you will execute the `waldo upload` command from a “run script”
+build phase in your Xcode project.
 
-See ??? for details.
+See [here] for details.
 
 ## <a name="credits">Credits</a>
 
@@ -64,4 +64,5 @@ Your friends at Waldo (info@waldo.io)
 The Waldo CLI is available under [commercial license].
 
 [commercial license]:   https://github.com/waldoapp/WaldoCLI/blob/master/LICENSE.md
+[here]:                 https://www.waldo.io
 [release]:              https://github.com/waldoapp/WaldoCLI/releases
