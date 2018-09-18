@@ -5,6 +5,16 @@ is based on [Keep a Changelog].
 
 This project adheres to [Semantic Versioning].
 
+## 0.21.0 - 2018-09-10
+
+### changed
+
+- Authorization header.
+
+### Fixed
+
+- Broken upload.
+
 ## 0.20.0 - 2018-07-18
 
 ### Added
