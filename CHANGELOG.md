@@ -5,6 +5,12 @@ is based on [Keep a Changelog].
 
 This project adheres to [Semantic Versioning].
 
+## 0.21.1 - 2018-09-20
+
+### changed
+
+- Installer certificate
+
 ## 0.21.0 - 2018-09-10
 
 ### changed
