@@ -1,68 +1,64 @@
 # Waldo CLI
 
-[![License](https://img.shields.io/badge/license-Commercial-000000.svg?style=flat)][commercial license]
-![Platform](https://img.shields.io/badge/platform-macOS-lightgrey.svg?style=flat)
+[![License](https://img.shields.io/badge/license-MIT-000000.svg?style=flat)][license]
+![Platform](https://img.shields.io/badge/platform-Linux%20|%20macOS-lightgrey.svg?style=flat)
 
-* [Overview](#overview)
-* [Requirements](#requirements)
-* [Installation](#installation)
-* [Usage](#usage)
-* [Credits](#credits)
-* [License](#license)
+## About Waldo
 
-## <a name="overview">Overview</a>
+[Waldo](https://www.waldo.io) provides fast, reliable, and maintainable tests
+for the most critical flows in your app. Waldo CLI is a command-line tool which
+allows you to upload an iOS or Android build to Waldo for processing.
 
-The Waldo CLI is a command-line tool for uploading your iOS app binary to the
-Waldo backend for processing.
+Simply download the `waldo` executable for the [latest release][release] and
+install it into `/usr/local/bin`. You can verify that you have installed it
+correctly with the `which waldo` and `waldo --help` commands.
 
-## <a name="requirements">Requirements</a>
+If you ever need to uninstall Waldo CLI, simply delete the executable from
+`/usr/local/bin`.
 
-* macOS 10.10+
+## Usage
 
-## <a name="installation">Installation</a>
+To get started, first obtain an API key and an application ID from Waldo for
+your app. These are used to authenticate with the Waldo backend on each call.
 
-The Waldo CLI is distributed as an installation package. Simply download and
-run the `WaldoCLI-x.y.z.pkg` file for the latest [release], then follow the
-on-screen instructions.
+Build a new IPA or APK for your app and specify the path to it (along with the
+Waldo API key and application ID) on the `waldo` command invocation:
 
-When the installation completes, you should find that a single executable named
-`waldo` has been installed into `/usr/local/bin`. You can can confirm this with
-the following command:
-
-```
-$ which waldo
-/usr/local/bin/waldo
+```bash
+$ waldo --key 0123456789abcdef0123456789abcdef \
+        --application app-0123456789abcdef     \
+        /path/to/YourApp.ipa
 ```
 
-You can also verify that the Waldo CLI is correctly installed with this command:
+Alternatively, you can use a configuration file to provide the Waldo API key
+and application ID. Simply create a plain text file named `.waldo.yml`. (If you
+prefer, you can name it `.waldo.yaml` instead.) Add the following two lines:
 
-```
-$ waldo version
-Waldo CLI 1.0.0 (macOS)
-```
-
-If you ever need to uninstall the Waldo CLI, simply delete the executable from
-`/usr/local/bin`:
-
-```
-$ rm -f /usr/local/bin/waldo
+```yaml
+api_key: 0123456789abcdef0123456789abcdef
+application_id: app-0123456789abcdef
 ```
 
-## <a name="usage">Usage</a>
+Make sure you replace the fake application ID and API key values shown above
+with the real credential values for your Waldo application.
 
-Typically, you will execute the `waldo upload` command from a “run script”
-build phase in your Xcode project.
+By default, Waldo CLI looks for your configuration file in the current working
+directory. You can provide an explicit path to your configuration file by
+specifying the `--configuration` option on the `waldo` command:
 
-See [here] for details.
+```bash
+$ waldo --configuration /path/to/.waldo.yml \
+        /path/to/YourApp.apk
+```
 
-## <a name="credits">Credits</a>
+And as a final alternative, you can use environment variables to provide the
+Waldo API key and application ID to Waldo CLI:
 
-Your friends at Waldo (info@waldo.io)
+```bash
+$ export WALDO_API_KEY=0123456789abcdef0123456789abcdef
+$ export WALDO_APPLICATION_ID=app-0123456789abcdef
+$ waldo /path/to/YourApp.ipa
+```
 
-## <a name="license">License</a>
-
-The Waldo CLI is available under [commercial license].
-
-[commercial license]:   https://github.com/waldoapp/WaldoCLI/blob/master/LICENSE.md
-[here]:                 https://www.waldo.io
-[release]:              https://github.com/waldoapp/WaldoCLI/releases
+[license]:  https://github.com/waldoapp/waldo-cli/blob/master/LICENSE
+[release]:  https://github.com/waldoapp/waldo-cli/releases
