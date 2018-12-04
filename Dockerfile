@@ -19,15 +19,7 @@
 
 FROM alpine:latest
 
-WORKDIR /usr/src/waldo
+RUN apk add --no-cache curl bash
 
-COPY Makefile ./
-COPY WaldoCLI.sh ./
-
-RUN apk add --no-cache bash curl make && \
-    make install && \
-    waldo --help
-
-WORKDIR /app
-
-CMD ["/bin/bash"]
+COPY WaldoCLI.sh /usr/local/bin/waldo
+RUN chmod a+x /usr/local/bin/waldo
