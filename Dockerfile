@@ -15,7 +15,6 @@
 # ```
 # $ docker run -it -v $(pwd):/app:ro linux-waldo-cli
 # ```
-#
 
 FROM alpine:latest
 
