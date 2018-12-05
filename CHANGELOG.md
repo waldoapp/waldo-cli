@@ -7,7 +7,7 @@ This project adheres to [Semantic Versioning].
 
 ## [Unreleased]
 
-## [1.0.0] - 2018-11-30
+## [1.0.0] - 2018-12-05
 
 Initial public release.
 

@@ -1,4 +1,3 @@
-#
 # This creates a minimal Docker image to allow easy testing of Waldo CLI on
 # Linux. It is based on the Alpine Linux image adding in Bash, curl, and make.
 # It also installs the `waldo` executable into `/usr/local/bin`.
@@ -18,7 +17,8 @@
 
 FROM alpine:latest
 
-RUN apk add --no-cache curl bash
+RUN apk add --no-cache bash curl
 
 COPY WaldoCLI.sh /usr/local/bin/waldo
+
 RUN chmod a+x /usr/local/bin/waldo
