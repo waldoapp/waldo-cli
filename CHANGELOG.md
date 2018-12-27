@@ -13,7 +13,7 @@ This project adheres to [Semantic Versioning].
 
 - Added `--variant_name` option.
 - Added support for `WALDO_VARIANT_NAME` environment variable.
-- Added `CLI_INTEGRATION.md` document.
+- Added `CI_INTEGRATION.md` document.
 
 ### Changed
 

@@ -18,45 +18,24 @@ If you ever need to uninstall Waldo CLI, simply delete the executable from
 
 ## Usage
 
-To get started, first obtain an API key and an application ID from Waldo for
-your app. These are used to authenticate with the Waldo backend on each call.
+To get started, first obtain an upload token from Waldo for your app. This is
+used to authenticate with the Waldo backend on each call.
 
 Build a new IPA or APK for your app and specify the path to it (along with the
-Waldo API key and application ID) on the `waldo` command invocation:
+Waldo upload token) on the `waldo` command invocation:
 
 ```bash
-$ waldo --key 0123456789abcdef0123456789abcdef \
-        --application app-0123456789abcdef     \
-        /path/to/YourApp.ipa
+$ waldo /path/to/YourApp.ipa --upload_token 0123456789abcdef0123456789abcdef
 ```
 
-Alternatively, you can use a configuration file to provide the Waldo API key
-and application ID. Simply create a plain text file named `.waldo.yml`. (If you
-prefer, you can name it `.waldo.yaml` instead.) Add the following two lines:
+Make sure you replace the fake upload token value shown above with the real
+value for your Waldo application.
 
-```yaml
-api_key: 0123456789abcdef0123456789abcdef
-application_id: app-0123456789abcdef
-```
-
-Make sure you replace the fake application ID and API key values shown above
-with the real credential values for your Waldo application.
-
-By default, Waldo CLI looks for your configuration file in the current working
-directory. You can provide an explicit path to your configuration file by
-specifying the `--configuration` option on the `waldo` command:
+You can also use an environment variable to provide the Waldo upload token to
+Waldo CLI:
 
 ```bash
-$ waldo --configuration /path/to/.waldo.yml \
-        /path/to/YourApp.apk
-```
-
-And as a final alternative, you can use environment variables to provide the
-Waldo API key and application ID to Waldo CLI:
-
-```bash
-$ export WALDO_API_KEY=0123456789abcdef0123456789abcdef
-$ export WALDO_APPLICATION_ID=app-0123456789abcdef
+$ export WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
 $ waldo /path/to/YourApp.ipa
 ```
 

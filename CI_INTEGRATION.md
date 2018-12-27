@@ -82,6 +82,56 @@ jobs:
           WALDO_BUILD_PATH: /path/to/YourApp.ipa                # set to your real build path
 ```
 
+## Uploading a Build with fastlane
+
+Waldo integration with [fastlane](https://fastlane.tools) requires you only to
+add the `waldo` plugin to your project:
+
+```bash
+fastlane add_plugin waldo
+```
+
+### Uploading an iOS Build
+
+Build a new IPA for your app. If you use `gym` (aka `build_ios_app`) to build
+your IPA, `waldo` will automatically find and upload the generated IPA.
+
+```ruby
+gym
+waldo(upload_token: '0123456789abcdef0123456789abcdef')
+```
+
+> **Note:** You _must_ specify the Waldo upload token.
+
+If for some reason you do _not_ use `gym` to build your IPA, you will need to
+explicitly specify the IPA path to `waldo`:
+
+```ruby
+waldo(ipa_path: '/path/to/YourApp.ipa',
+      upload_token: '0123456789abcdef0123456789abcdef')
+```
+
+### Uploading an Android Build
+
+Build a new APK for your app. If you use `gradle` to build your APK, `waldo`
+will automatically find and upload the generated APK.
+
+```ruby
+gradle(task: 'assemble',
+       build_type: 'Release')
+waldo(upload_token: '0123456789abcdef0123456789abcdef')
+```
+
+> **Note:** You _must_ specify the Waldo upload token.
+
+If for some reason you do _not_ use `gradle` to build your APK, you will need
+to explicitly specify the APK path to `waldo`:
+
+```ruby
+waldo(apk_path: '/path/to/YourApp.apk',
+      upload_token: '0123456789abcdef0123456789abcdef')
+```
+
 ## Uploading a Build Manually
 
 For the pain-lovers out there, you can also upload your iOS or Android build
