@@ -42,7 +42,7 @@ to your workflow containing the following:
 
 set -ex
 
-WALDO_CLI_BIN="/usr/local/bin"              # or wherever you prefer
+WALDO_CLI_BIN=/usr/local/bin                # or wherever you prefer
 
 if [ ! -e "$WALDO_CLI_BIN"/waldo ]; then
   curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.0.0/waldo > "$WALDO_CLI_BIN"/waldo
