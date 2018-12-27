@@ -20,12 +20,11 @@ Add the following to `appcenter-post-build.sh`:
 ```bash
 WALDO_CLI_BIN=/usr/local/bin                        # or wherever you prefer
 
-UPLOAD_TOKEN=0123456789abcdef0123456789abcdef       # set to your real upload token
+WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef # set to your real upload token
 BUILD_PATH=$APPCENTER_OUTPUT_DIRECTORY/YourApp.apk  # for Android
 BUILD_PATH=$APPCENTER_OUTPUT_DIRECTORY/YourApp.ipa  # for iOS
 
-"$WALDO_CLI_BIN"/waldo "$BUILD_PATH"                \
-                       --upload_token $UPLOAD_TOKEN
+"$WALDO_CLI_BIN"/waldo "$BUILD_PATH"
 ```
 
 ## Uploading a Build with Bitrise
@@ -40,19 +39,18 @@ to your workflow containing the following:
 
 set -ex
 
-WALDO_CLI_BIN=/usr/local/bin                    # or wherever you prefer
+WALDO_CLI_BIN=/usr/local/bin                        # or wherever you prefer
 
 if [ ! -e "$WALDO_CLI_BIN"/waldo ]; then
   curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.1.0/waldo > "$WALDO_CLI_BIN"/waldo
   chmod +x "$WALDO_CLI_BIN"/waldo
 fi
 
-UPLOAD_TOKEN=0123456789abcdef0123456789abcdef   # set to your real upload token
-BUILD_PATH=$BITRISE_APK_PATH                    # for Android
-BUILD_PATH=$BITRISE_IPA_PATH                    # for iOS
+WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef # set to your real upload token
+BUILD_PATH=$BITRISE_APK_PATH                        # for Android
+BUILD_PATH=$BITRISE_IPA_PATH                        # for iOS
 
-"$WALDO_CLI_BIN"/waldo "$BUILD_PATH"                \
-                       --upload_token $UPLOAD_TOKEN
+"$WALDO_CLI_BIN"/waldo "$BUILD_PATH"
 ```
 
 ## Uploading a Build with CircleCI
@@ -92,23 +90,23 @@ be accepted.
 ### Uploading an iOS Build
 
 ```bash
-$ UPLOAD_TOKEN=0123456789abcdef0123456789abcdef # set to your real upload token
-$ BUILD_PATH=/path/to/YourApp.ipa               # set to your real build path
-$ curl --data-binary @"$BUILD_PATH"                     \
-       -H "Authorization: Upload-Token $UPLOAD_TOKEN"   \
-       -H "Content-Type: application/octet-stream"      \
-       -H "User-Agent: Waldo CLI/iOS v1.1.0"            \
+$ WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef   # set to your real upload token
+$ BUILD_PATH=/path/to/YourApp.ipa                       # set to your real build path
+$ curl --data-binary @"$BUILD_PATH"                         \
+       -H "Authorization: Upload-Token $WALDO_UPLOAD_TOKEN" \
+       -H "Content-Type: application/octet-stream"          \
+       -H "User-Agent: Waldo CLI/iOS v1.1.0"                \
        https://api.waldo.io/versions
 ```
 
 ### Uploading an Android Build
 
 ```bash
-$ UPLOAD_TOKEN=0123456789abcdef0123456789abcdef # set to your real upload token
-$ BUILD_PATH=/path/to/YourApp.apk               # set to your real build path
-$ curl --data-binary @"$BUILD_PATH"                     \
-       -H "Authorization: Upload-Token $UPLOAD_TOKEN"   \
-       -H "Content-Type: application/octet-stream"      \
-       -H "User-Agent: Waldo CLI/Android v1.1.0"        \
+$ WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef   # set to your real upload token
+$ BUILD_PATH=/path/to/YourApp.apk                       # set to your real build path
+$ curl --data-binary @"$BUILD_PATH"                         \
+       -H "Authorization: Upload-Token $WALDO_UPLOAD_TOKEN" \
+       -H "Content-Type: application/octet-stream"          \
+       -H "User-Agent: Waldo CLI/Android v1.1.0"            \
        https://api.waldo.io/versions
 ```
