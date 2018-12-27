@@ -9,7 +9,7 @@ steps](https://docs.microsoft.com/en-us/appcenter/build/custom/scripts/).
 Add the following to `appcenter-post-clone.sh`:
 
 ```bash
-WALDO_CLI_BIN=/usr/local/bin                        # or wherever you prefer
+WALDO_CLI_BIN=/usr/local/bin                                # or wherever you prefer
 
 curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.1.0/waldo > "$WALDO_CLI_BIN"/waldo
 chmod +x "$WALDO_CLI_BIN"/waldo
@@ -18,11 +18,12 @@ chmod +x "$WALDO_CLI_BIN"/waldo
 Add the following to `appcenter-post-build.sh`:
 
 ```bash
-WALDO_CLI_BIN=/usr/local/bin                        # or wherever you prefer
+WALDO_CLI_BIN=/usr/local/bin                                # or wherever you prefer
 
-WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef # set to your real upload token
-BUILD_PATH=$APPCENTER_OUTPUT_DIRECTORY/YourApp.apk  # for Android
-BUILD_PATH=$APPCENTER_OUTPUT_DIRECTORY/YourApp.ipa  # for iOS
+export WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef  # set to your real upload token
+
+BUILD_PATH=$APPCENTER_OUTPUT_DIRECTORY/YourApp.apk          # for Android
+BUILD_PATH=$APPCENTER_OUTPUT_DIRECTORY/YourApp.ipa          # for iOS
 
 "$WALDO_CLI_BIN"/waldo "$BUILD_PATH"
 ```
@@ -46,9 +47,10 @@ if [ ! -e "$WALDO_CLI_BIN"/waldo ]; then
   chmod +x "$WALDO_CLI_BIN"/waldo
 fi
 
-WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef # set to your real upload token
-BUILD_PATH=$BITRISE_APK_PATH                        # for Android
-BUILD_PATH=$BITRISE_IPA_PATH                        # for iOS
+export WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef  # set to your real upload token
+
+BUILD_PATH=$BITRISE_APK_PATH                                # for Android
+BUILD_PATH=$BITRISE_IPA_PATH                                # for iOS
 
 "$WALDO_CLI_BIN"/waldo "$BUILD_PATH"
 ```
@@ -90,8 +92,8 @@ be accepted.
 ### Uploading an iOS Build
 
 ```bash
-$ WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef   # set to your real upload token
-$ BUILD_PATH=/path/to/YourApp.ipa                       # set to your real build path
+$ export WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef    # set to your real upload token
+$ BUILD_PATH=/path/to/YourApp.ipa                               # set to your real build path
 $ curl --data-binary @"$BUILD_PATH"                         \
        -H "Authorization: Upload-Token $WALDO_UPLOAD_TOKEN" \
        -H "Content-Type: application/octet-stream"          \
@@ -102,8 +104,8 @@ $ curl --data-binary @"$BUILD_PATH"                         \
 ### Uploading an Android Build
 
 ```bash
-$ WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef   # set to your real upload token
-$ BUILD_PATH=/path/to/YourApp.apk                       # set to your real build path
+$ export WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef    # set to your real upload token
+$ BUILD_PATH=/path/to/YourApp.apk                               # set to your real build path
 $ curl --data-binary @"$BUILD_PATH"                         \
        -H "Authorization: Upload-Token $WALDO_UPLOAD_TOKEN" \
        -H "Content-Type: application/octet-stream"          \
