@@ -62,21 +62,22 @@ BUILD_PATH=$BITRISE_IPA_PATH                # for iOS
 ## Uploading a Build with CircleCI
 
 Waldo integration with [Circle CI](https://circleci.com) requires you only to
-add a couple of steps to your `.circleci/config.yml`
+add a couple of steps to your
 [configuration](https://circleci.com/docs/2.0/configuration-reference/):
 
 ```yaml
 jobs:
   build:    # or whatever name you choose
     steps:
-      #...
       - run:
         name: Download Waldo CLI
         command: |
           curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.0.0/waldo > .circleci/waldo
+
       #...
       #... (build steps)
       #...
+
       - run:
         name: Upload build to Waldo
         command: .circleci/waldo "$WALDO_BUILD_PATH"
@@ -84,7 +85,6 @@ jobs:
           WALDO_API_KEY: 0123456789abcdef0123456789abcdef
           WALDO_APPLICATION_ID: app-0123456789abcdef
           WALDO_BUILD_PATH: /path/to/YourApp.ipa
-      #...
 ```
 
 ## Uploading a Build Manually
