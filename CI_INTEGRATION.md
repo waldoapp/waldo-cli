@@ -57,7 +57,7 @@ BUILD_PATH=$BITRISE_IPA_PATH                                # for iOS
 
 ## Uploading a Build with CircleCI
 
-Waldo integration with [Circle CI](https://circleci.com) requires you only to
+Waldo integration with [CircleCI](https://circleci.com) requires you only to
 add a couple of steps to your
 [configuration](https://circleci.com/docs/2.0/configuration-reference/):
 
@@ -80,6 +80,26 @@ jobs:
         environment:
           WALDO_UPLOAD_TOKEN: 0123456789abcdef0123456789abcdef  # set to your real upload token
           WALDO_BUILD_PATH: /path/to/YourApp.ipa                # set to your real build path
+```
+
+## Uploading a Build with Travis CI
+
+Waldo integration with [Travis CI](https://travis-ci.com) requires you only to
+add a few steps to your [.travis.yml](https://docs.travis-ci.com):
+
+```yaml
+env:
+  global:
+    - WALDO_CLI_BIN=/usr/local/bin                          # or wherever you prefer
+    - WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef   # set to your real upload token
+    - WALDO_BUILD_PATH=/path/to/YourApp.ipa                 # set to your real build path
+
+install:
+  - curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.1.0/waldo > "$WALDO_CLI_BIN"/waldo
+  - chmod +x "$WALDO_CLI_BIN"/waldo
+
+script:
+  - "$WALDO_CLI_BIN"/waldo "$WALDO_BUILD_PATH"
 ```
 
 ## Uploading a Build with fastlane
