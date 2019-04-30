@@ -7,6 +7,12 @@ This project adheres to [Semantic Versioning].
 
 ## [Unreleased]
 
+## [1.2.0] - 2019-04-30
+
+### Added
+
+- Added support for iOS simulator builds (`.app`).
+
 ## [1.1.0] - 2018-12-27
 
 ### Added
@@ -29,7 +35,8 @@ This project adheres to [Semantic Versioning].
 
 Initial public release.
 
-[Unreleased]:   https://github.com/waldoapp/waldo-cli/compare/1.1.0...HEAD
+[Unreleased]:   https://github.com/waldoapp/waldo-cli/compare/1.2.0...HEAD
+[1.2.0]:        https://github.com/waldoapp/waldo-cli/compare/1.1.0...1.2.0
 [1.1.0]:        https://github.com/waldoapp/waldo-cli/compare/1.0.0...1.1.0
 [1.0.0]:        https://github.com/waldoapp/waldo-cli/compare/c7c5b82...1.0.0
 

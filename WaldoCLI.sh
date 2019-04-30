@@ -2,11 +2,14 @@
 
 set -eu -o pipefail
 
-waldo_cli_version="1.1.0"
+waldo_api_endpoint=${WALDO_API_ENDPOINT:-https://api.waldo.io/versions}
+waldo_cli_version="1.2.0"
 
-waldo_build_path=""
 waldo_build_flavor=""
+waldo_build_path=""
+waldo_build_suffix=""
 waldo_extra_args="--show-error --silent"
+waldo_upload_path=""
 waldo_upload_token=""
 waldo_variant_name=""
 
@@ -36,13 +39,12 @@ function check_build_path() {
     [[ -n $waldo_build_path ]] || fail_usage "Missing required argument: ‘path’"
 
     waldo_build_path=$(abs_path "$waldo_build_path")
+    waldo_build_suffix=${waldo_build_path##*.}
 
-    local _suffix=${waldo_build_path##*.}
-
-    case $_suffix in
-        apk) waldo_build_flavor="Android" ;;
-        ipa) waldo_build_flavor="iOS" ;;
-        *)   fail "File extension of build at ‘${waldo_build_path}’ is not recognized" ;;
+    case $waldo_build_suffix in
+        apk)     waldo_build_flavor="Android" ;;
+        app|ipa) waldo_build_flavor="iOS" ;;
+        *)       fail "File extension of build at ‘${waldo_build_path}’ is not recognized" ;;
     esac
 }
 
@@ -73,12 +75,12 @@ function check_variant_name() {
 
 function curl_upload_build() {
     local _authorization=$(get_authorization)
-    local _content_type="application/octet-stream"
+    local _content_type=$(get_content_type)
     local _user_agent=$(get_user_agent)
     local _url=$(make_url)
 
     curl $waldo_extra_args                          \
-        --data-binary @"$waldo_build_path"          \
+        --data-binary @"$waldo_upload_path"         \
         --header "Authorization: $_authorization"   \
         --header "Content-Type: $_content_type"     \
         --header "User-Agent: $_user_agent"         \
@@ -124,6 +126,13 @@ function get_authorization() {
     echo "Upload-Token $waldo_upload_token"
 }
 
+function get_content_type() {
+    case $waldo_build_suffix in
+        app) echo "application/zip" ;;
+        *)   echo "application/octet-stream" ;;
+    esac
+}
+
 function get_platform() {
     local _os_name=$(uname -s)
 
@@ -139,15 +148,39 @@ function get_user_agent() {
 
 function make_url() {
     if [[ -z $waldo_variant_name ]]; then
-        echo "https://api.waldo.io/versions"
+        echo "${waldo_api_endpoint}"
     else
-        echo "https://api.waldo.io/versions?variantName=$waldo_variant_name"
+        echo "${waldo_api_endpoint}?variantName=$waldo_variant_name"
     fi
 }
 
 function upload_build() {
-    ([[ -f $waldo_build_path ]] && [[ -r $waldo_build_path ]])  \
-        || fail "Unable to read build at ‘${waldo_build_path}’"
+    local _parent_path=$(dirname "$waldo_build_path")
+    local _build_name=$(basename "$waldo_build_path")
+    local _working_path=""
+
+    case $waldo_build_suffix in
+        app)
+            ([[ -d $waldo_build_path ]] && [[ -r $waldo_build_path ]])  \
+                || fail "Unable to read build at ‘${waldo_build_path}’"
+
+            _working_path=/tmp/WaldoCLI-$$
+
+            waldo_upload_path=$_working_path/$_build_name.zip
+
+            rm -rf "$_working_path"
+            mkdir -p "$_working_path"
+
+            (cd "$_parent_path" &>/dev/null && zip -qry "$waldo_upload_path" "$_build_name") || exit
+            ;;
+
+        *)
+            ([[ -f $waldo_build_path ]] && [[ -r $waldo_build_path ]])  \
+                || fail "Unable to read build at ‘${waldo_build_path}’"
+
+            waldo_upload_path=$waldo_build_path
+            ;;
+    esac
 
     echo "Uploading the build to Waldo. This could take a while…"
 
@@ -159,11 +192,13 @@ function upload_build() {
 
     [[ $waldo_extra_args == "--verbose" ]] && echo "$_response"
 
-    local _build_name=$(basename "$waldo_build_path")
-
     [[ $waldo_extra_args == "--verbose" ]] && echo ""
 
     echo "Build ‘${_build_name}’ successfully uploaded to Waldo!"
+
+    if [[ -n $_working_path ]]; then
+        rm -rf "$_working_path"
+    fi
 }
 
 display_version
