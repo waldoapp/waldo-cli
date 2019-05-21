@@ -2,8 +2,9 @@
 
 set -eu -o pipefail
 
-waldo_api_endpoint=${WALDO_API_ENDPOINT:-https://api.waldo.io/versions}
-waldo_cli_version="1.2.0"
+waldo_api_build_endpoint=${WALDO_API_BUILD_ENDPOINT:-https://api.waldo.io/versions}
+waldo_api_error_endpoint=${WALDO_API_ERROR_ENDPOINT:-https://api.waldo.io/uploadError}
+waldo_cli_version="1.2.1"
 
 waldo_build_flavor=""
 waldo_build_path=""
@@ -75,9 +76,9 @@ function check_variant_name() {
 
 function curl_upload_build() {
     local _authorization=$(get_authorization)
-    local _content_type=$(get_content_type)
+    local _content_type=$(get_build_content_type)
     local _user_agent=$(get_user_agent)
-    local _url=$(make_url)
+    local _url=$(make_build_url)
 
     curl $waldo_extra_args                          \
         --data-binary @"$waldo_upload_path"         \
@@ -85,6 +86,21 @@ function curl_upload_build() {
         --header "Content-Type: $_content_type"     \
         --header "User-Agent: $_user_agent"         \
         "$_url" || fail "Build failed to upload to Waldo: $?"
+}
+
+function curl_upload_error() {
+    local _message=$1
+    local _authorization=$(get_authorization)
+    local _content_type=$(get_error_content_type)
+    local _user_agent=$(get_user_agent)
+    local _url=$(make_error_url)
+
+    curl --silent                                   \
+        --data "{\"message\":\"${_message}\"}"      \
+        --header "Authorization: $_authorization"   \
+        --header "Content-Type: $_content_type"     \
+        --header "User-Agent: $_user_agent"         \
+        "$_url" &>/dev/null
 }
 
 function display_usage() {
@@ -110,12 +126,16 @@ function display_version() {
 }
 
 function fail() {
+    [[ -z $waldo_upload_token ]] || curl_upload_error "$1"
+
     echo ""                 # flush stdout
     echo "waldo: $1" 1>&2
     exit 1
 }
 
 function fail_usage() {
+    [[ -z $waldo_upload_token ]] || curl_upload_error "$1"
+
     echo ""                 # flush stdout
     echo "waldo: $1" 1>&2
     display_usage
@@ -126,11 +146,15 @@ function get_authorization() {
     echo "Upload-Token $waldo_upload_token"
 }
 
-function get_content_type() {
+function get_build_content_type() {
     case $waldo_build_suffix in
         app) echo "application/zip" ;;
         *)   echo "application/octet-stream" ;;
     esac
+}
+
+function get_error_content_type() {
+    echo "application/json"
 }
 
 function get_platform() {
@@ -146,12 +170,16 @@ function get_user_agent() {
     echo "Waldo CLI/$waldo_build_flavor v$waldo_cli_version"
 }
 
-function make_url() {
+function make_build_url() {
     if [[ -z $waldo_variant_name ]]; then
-        echo "${waldo_api_endpoint}"
+        echo "${waldo_api_build_endpoint}"
     else
-        echo "${waldo_api_endpoint}?variantName=$waldo_variant_name"
+        echo "${waldo_api_build_endpoint}?variantName=$waldo_variant_name"
     fi
+}
+
+function make_error_url() {
+    echo "${waldo_api_error_endpoint}"
 }
 
 function upload_build() {

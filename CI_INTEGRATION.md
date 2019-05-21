@@ -11,7 +11,7 @@ Add the following to `appcenter-post-clone.sh`:
 ```bash
 WALDO_CLI_BIN=/usr/local/bin                                # or wherever you prefer
 
-curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.2.0/waldo > "$WALDO_CLI_BIN"/waldo
+curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.2.1/waldo > "$WALDO_CLI_BIN"/waldo
 chmod +x "$WALDO_CLI_BIN"/waldo
 ```
 
@@ -43,7 +43,7 @@ set -ex
 WALDO_CLI_BIN=/usr/local/bin                        # or wherever you prefer
 
 if [ ! -e "$WALDO_CLI_BIN"/waldo ]; then
-  curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.2.0/waldo > "$WALDO_CLI_BIN"/waldo
+  curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.2.1/waldo > "$WALDO_CLI_BIN"/waldo
   chmod +x "$WALDO_CLI_BIN"/waldo
 fi
 
@@ -68,7 +68,7 @@ jobs:
       - run:
         name: Download Waldo CLI
         command: |
-          curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.2.0/waldo > .circleci/waldo
+          curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.2.1/waldo > .circleci/waldo
 
       #...
       #... (build steps)
@@ -95,7 +95,7 @@ env:
     - WALDO_BUILD_PATH=/path/to/YourApp.ipa                 # set to your real build path
 
 install:
-  - curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.2.0/waldo > "$WALDO_CLI_BIN"/waldo
+  - curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.2.1/waldo > "$WALDO_CLI_BIN"/waldo
   - chmod +x "$WALDO_CLI_BIN"/waldo
 
 script:
@@ -197,7 +197,7 @@ $ BUILD_PATH=/path/to/YourApp.ipa               # set to your real build path
 $ curl --data-binary @"$BUILD_PATH"                     \
        -H "Authorization: Upload-Token $UPLOAD_TOKEN"   \
        -H "Content-Type: application/octet-stream"      \
-       -H "User-Agent: Waldo CLI/iOS v1.2.0"            \
+       -H "User-Agent: Waldo CLI/iOS v1.2.1"            \
        https://api.waldo.io/versions
 ```
 
@@ -209,7 +209,7 @@ $ BUILD_PATH=/path/to/YourApp.app.zip           # set to your real build path
 $ curl --data-binary @"$BUILD_PATH"                     \
        -H "Authorization: Upload-Token $UPLOAD_TOKEN"   \
        -H "Content-Type: application/zip"               \
-       -H "User-Agent: Waldo CLI/iOS v1.2.0"            \
+       -H "User-Agent: Waldo CLI/iOS v1.2.1"            \
        https://api.waldo.io/versions
 ```
 
@@ -223,6 +223,6 @@ $ BUILD_PATH=/path/to/YourApp.apk               # set to your real build path
 $ curl --data-binary @"$BUILD_PATH"                     \
        -H "Authorization: Upload-Token $UPLOAD_TOKEN"   \
        -H "Content-Type: application/octet-stream"      \
-       -H "User-Agent: Waldo CLI/Android v1.2.0"        \
+       -H "User-Agent: Waldo CLI/Android v1.2.1"        \
        https://api.waldo.io/versions
 ```
