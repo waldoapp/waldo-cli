@@ -7,6 +7,13 @@ This project adheres to [Semantic Versioning].
 
 ## [Unreleased]
 
+## [1.3.0] - 2019-08-02
+
+### Added
+
+- Added support for uploading the git commit history (SHAs and branch names
+  only) associated with a build if the script is executed from a git repository.
+
 ## [1.2.1] - 2019-05-21
 
 ### Changed
@@ -41,7 +48,8 @@ This project adheres to [Semantic Versioning].
 
 Initial public release.
 
-[Unreleased]:   https://github.com/waldoapp/waldo-cli/compare/1.2.1...HEAD
+[Unreleased]:   https://github.com/waldoapp/waldo-cli/compare/1.3.0...HEAD
+[1.3.0]:        https://github.com/waldoapp/waldo-cli/compare/1.2.1...1.3.0
 [1.2.1]:        https://github.com/waldoapp/waldo-cli/compare/1.2.0...1.2.1
 [1.2.0]:        https://github.com/waldoapp/waldo-cli/compare/1.1.0...1.2.0
 [1.1.0]:        https://github.com/waldoapp/waldo-cli/compare/1.0.0...1.1.0

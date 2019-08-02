@@ -4,12 +4,14 @@ set -eu -o pipefail
 
 waldo_api_build_endpoint=${WALDO_API_BUILD_ENDPOINT:-https://api.waldo.io/versions}
 waldo_api_error_endpoint=${WALDO_API_ERROR_ENDPOINT:-https://api.waldo.io/uploadError}
-waldo_cli_version="1.2.1"
+waldo_cli_version="1.3.0"
 
 waldo_build_flavor=""
 waldo_build_path=""
 waldo_build_suffix=""
 waldo_extra_args="--show-error --silent"
+waldo_history=""
+waldo_history_error=""
 waldo_upload_path=""
 waldo_upload_token=""
 waldo_variant_name=""
@@ -49,6 +51,18 @@ function check_build_path() {
     esac
 }
 
+function check_history() {
+    if [[ -z $(which git) ]]; then
+        waldo_history_error="noGitCommandFound"
+    elif [[ -z $(which base64) ]]; then
+        waldo_history_error="noBase64CommandFound"
+    elif ! git rev-parse >& /dev/null; then
+        waldo_history_error="notGitRepository"
+    else
+        waldo_history=$(get_history)
+    fi
+}
+
 function check_status() {
     local _response=$1
 
@@ -72,6 +86,36 @@ function check_upload_token() {
 
 function check_variant_name() {
     [[ -n $waldo_variant_name ]] || waldo_variant_name=${WALDO_VARIANT_NAME:-}
+}
+
+function convert_sha() {
+    local _full_sha=$1
+    local _full_name=$(git name-rev --exclude='tags/*' --name-only "$_full_sha")
+    local _abbr_sha=${_full_sha:0:7}
+    local _abbr_name=$_full_name
+    local _prefix="remotes/origin/"
+
+    if [[ ${_full_name:0:${#_prefix}} == $_prefix ]]; then
+        _abbr_name=${_full_name#$_prefix}
+    else
+        _abbr_name="local:${_full_name}"
+    fi
+
+    echo "${_abbr_sha}-${_abbr_name}"
+}
+
+function convert_shas() {
+    local _list=
+
+    while (( $# )); do
+        local _item=$(convert_sha "$1")
+
+        _list+=",\"${_item}\""
+
+        shift
+    done
+
+    echo ${_list#?}
 }
 
 function curl_upload_build() {
@@ -157,6 +201,13 @@ function get_error_content_type() {
     echo "application/json"
 }
 
+function get_history() {
+    local _shas=$(git log --format=%H -50)
+    local _history=$(convert_shas $_shas)
+
+    echo "[${_history}]" | base64
+}
+
 function get_platform() {
     local _os_name=$(uname -s)
 
@@ -171,10 +222,22 @@ function get_user_agent() {
 }
 
 function make_build_url() {
-    if [[ -z $waldo_variant_name ]]; then
-        echo "${waldo_api_build_endpoint}"
+    local _query=
+
+    if [[ -n $waldo_history ]]; then
+        _query+="&history=$waldo_history"
+    elif [[ -n $waldo_history_error ]]; then
+        _query+="&historyError=$waldo_history_error"
+    fi
+
+    if [[ -n $waldo_variant_name ]]; then
+        _query+="&variantName=$waldo_variant_name"
+    fi
+
+    if [[ -n $_query ]]; then
+        echo "${waldo_api_build_endpoint}?${_query:1}"
     else
-        echo "${waldo_api_build_endpoint}?variantName=$waldo_variant_name"
+        echo "${waldo_api_build_endpoint}"
     fi
 }
 
@@ -277,6 +340,7 @@ while (( $# )); do
 done
 
 check_build_path || exit
+check_history || exit
 check_upload_token || exit
 check_variant_name || exit
 
