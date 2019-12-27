@@ -4,7 +4,7 @@ set -eu -o pipefail
 
 waldo_api_build_endpoint=${WALDO_API_BUILD_ENDPOINT:-https://api.waldo.io/versions}
 waldo_api_error_endpoint=${WALDO_API_ERROR_ENDPOINT:-https://api.waldo.io/uploadError}
-waldo_cli_version="1.3.0"
+waldo_cli_version="1.4.0"
 
 waldo_build_flavor=""
 waldo_build_path=""
@@ -74,7 +74,7 @@ function check_status() {
         if (( $_status == 401 )); then
             fail "Upload token is invalid or missing!"
         elif (( $_status < 200 || $_status > 299 )); then
-            fail "Build failed to upload to Waldo: $_status"
+            fail "Unable to upload build to Waldo, HTTP status: $_status"
         fi
     fi
 }
@@ -119,6 +119,7 @@ function convert_shas() {
 }
 
 function curl_upload_build() {
+    local _output_path="$1"
     local _authorization=$(get_authorization)
     local _content_type=$(get_build_content_type)
     local _user_agent=$(get_user_agent)
@@ -129,11 +130,18 @@ function curl_upload_build() {
         --header "Authorization: $_authorization"   \
         --header "Content-Type: $_content_type"     \
         --header "User-Agent: $_user_agent"         \
-        "$_url" || fail "Build failed to upload to Waldo: $?"
+        --output "$_output_path"                    \
+        "$_url"
+
+    local _curl_status=$?
+
+    if (( $_curl_status != 0 )); then
+        fail "Unable to upload build to Waldo, curl error: ${_curl_status}, url: ${_url}"
+    fi
 }
 
 function curl_upload_error() {
-    local _message=$1
+    local _message=$(json_escape "$1")
     local _authorization=$(get_authorization)
     local _content_type=$(get_error_content_type)
     local _user_agent=$(get_user_agent)
@@ -170,10 +178,20 @@ function display_version() {
 }
 
 function fail() {
-    [[ -z $waldo_upload_token ]] || curl_upload_error "$1"
+    local _message="waldo: $1"
+
+    if [[ -n $waldo_upload_token ]]; then
+        curl_upload_error "$1"
+
+        local _curl_status=$?
+
+        if (( $_curl_status == 0)); then
+            _message+=" -- Waldo team has been informed"
+        fi
+    fi
 
     echo ""                 # flush stdout
-    echo "waldo: $1" 1>&2
+    echo "$_message" 1>&2
     exit 1
 }
 
@@ -205,7 +223,7 @@ function get_history() {
     local _shas=$(git log --format=%H -50)
     local _history=$(convert_shas $_shas)
 
-    echo "[${_history}]" | base64
+    echo "[${_history}]" | websafe_base64_encode
 }
 
 function get_platform() {
@@ -219,6 +237,16 @@ function get_platform() {
 
 function get_user_agent() {
     echo "Waldo CLI/$waldo_build_flavor v$waldo_cli_version"
+}
+
+function json_escape() {
+    local _result=${1//\\/\\\\} # \
+
+    _result=${_result//\//\\\/} # /
+    _result=${_result//\'/\\\'} # '
+    _result=${_result//\"/\\\"} # "
+
+    echo "$_result"
 }
 
 function make_build_url() {
@@ -248,19 +276,17 @@ function make_error_url() {
 function upload_build() {
     local _parent_path=$(dirname "$waldo_build_path")
     local _build_name=$(basename "$waldo_build_path")
-    local _working_path=""
+    local _working_path=/tmp/WaldoCLI-$$
+
+    rm -rf "$_working_path"
+    mkdir -p "$_working_path"
 
     case $waldo_build_suffix in
         app)
             ([[ -d $waldo_build_path ]] && [[ -r $waldo_build_path ]])  \
                 || fail "Unable to read build at ‘${waldo_build_path}’"
 
-            _working_path=/tmp/WaldoCLI-$$
-
             waldo_upload_path=$_working_path/$_build_name.zip
-
-            rm -rf "$_working_path"
-            mkdir -p "$_working_path"
 
             (cd "$_parent_path" &>/dev/null && zip -qry "$waldo_upload_path" "$_build_name") || exit
             ;;
@@ -273,23 +299,34 @@ function upload_build() {
             ;;
     esac
 
+    local _response_path=$_working_path/response.json
+
     echo "Uploading the build to Waldo. This could take a while…"
 
     [[ $waldo_extra_args == "--verbose" ]] && echo ""
 
-    local _response=$(curl_upload_build)
+    curl_upload_build "$_response_path"
 
-    check_status "$_response"
+    local _curl_status=$?
+    local _response=$(cat "$_response_path" 2>/dev/null)
 
     [[ $waldo_extra_args == "--verbose" ]] && echo "$_response"
 
     [[ $waldo_extra_args == "--verbose" ]] && echo ""
 
-    echo "Build ‘${_build_name}’ successfully uploaded to Waldo!"
-
     if [[ -n $_working_path ]]; then
         rm -rf "$_working_path"
     fi
+
+    check_status "$_response"
+
+    if (( $_curl_status == 0 )); then
+        echo "Build ‘${_build_name}’ successfully uploaded to Waldo!"
+    fi
+}
+
+function websafe_base64_encode() {
+    base64 | tr -d '=' | tr '/+' '_-'
 }
 
 display_version

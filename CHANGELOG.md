@@ -7,6 +7,16 @@ This project adheres to [Semantic Versioning].
 
 ## [Unreleased]
 
+## [1.4.0] - 2019-12-27
+
+### Changed
+
+- Enhanced error reporting.
+
+### Fixed
+
+- Fixed some issues with Base64 encoding and JSON string quoting.
+
 ## [1.3.0] - 2019-08-02
 
 ### Added
@@ -48,7 +58,8 @@ This project adheres to [Semantic Versioning].
 
 Initial public release.
 
-[Unreleased]:   https://github.com/waldoapp/waldo-cli/compare/1.3.0...HEAD
+[Unreleased]:   https://github.com/waldoapp/waldo-cli/compare/1.4.0...HEAD
+[1.4.0]:        https://github.com/waldoapp/waldo-cli/compare/1.3.0...1.4.0
 [1.3.0]:        https://github.com/waldoapp/waldo-cli/compare/1.2.1...1.3.0
 [1.2.1]:        https://github.com/waldoapp/waldo-cli/compare/1.2.0...1.2.1
 [1.2.0]:        https://github.com/waldoapp/waldo-cli/compare/1.1.0...1.2.0
