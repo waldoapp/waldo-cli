@@ -7,6 +7,12 @@ This project adheres to [Semantic Versioning].
 
 ## [Unreleased]
 
+## [1.4.1] - 2020-02-06
+
+### Fixed
+
+- Fixed issues running on Linux.
+
 ## [1.4.0] - 2019-12-27
 
 ### Changed
@@ -58,7 +64,8 @@ This project adheres to [Semantic Versioning].
 
 Initial public release.
 
-[Unreleased]:   https://github.com/waldoapp/waldo-cli/compare/1.4.0...HEAD
+[Unreleased]:   https://github.com/waldoapp/waldo-cli/compare/1.4.1...HEAD
+[1.4.1]:        https://github.com/waldoapp/waldo-cli/compare/1.4.0...1.4.1
 [1.4.0]:        https://github.com/waldoapp/waldo-cli/compare/1.3.0...1.4.0
 [1.3.0]:        https://github.com/waldoapp/waldo-cli/compare/1.2.1...1.3.0
 [1.2.1]:        https://github.com/waldoapp/waldo-cli/compare/1.2.0...1.2.1

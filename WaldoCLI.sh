@@ -4,7 +4,7 @@ set -eu -o pipefail
 
 waldo_api_build_endpoint=${WALDO_API_BUILD_ENDPOINT:-https://api.waldo.io/versions}
 waldo_api_error_endpoint=${WALDO_API_ERROR_ENDPOINT:-https://api.waldo.io/uploadError}
-waldo_cli_version="1.4.0"
+waldo_cli_version="1.4.1"
 
 waldo_build_flavor=""
 waldo_build_path=""
@@ -12,6 +12,7 @@ waldo_build_suffix=""
 waldo_extra_args="--show-error --silent"
 waldo_history=""
 waldo_history_error=""
+waldo_platform=""
 waldo_upload_path=""
 waldo_upload_token=""
 waldo_variant_name=""
@@ -56,10 +57,23 @@ function check_history() {
         waldo_history_error="noGitCommandFound"
     elif [[ -z $(which base64) ]]; then
         waldo_history_error="noBase64CommandFound"
+    elif [[ -z $(which tr) ]]; then
+        waldo_history_error="noTr64CommandFound"
     elif ! git rev-parse >& /dev/null; then
         waldo_history_error="notGitRepository"
     else
         waldo_history=$(get_history)
+    fi
+}
+
+function check_platform() {
+#    case "$waldo_platform" in
+#        Linux|macOS) ;;
+#        *) fail "Platform ‘${waldo_platform}’ is not supported" ;;
+#    esac
+
+    if [[ -z $(which curl) ]]; then
+        fail "No ‘curl’ command found"
     fi
 }
 
@@ -90,7 +104,7 @@ function check_variant_name() {
 
 function convert_sha() {
     local _full_sha=$1
-    local _full_name=$(git name-rev --exclude='tags/*' --name-only "$_full_sha")
+    local _full_name=$(git name-rev --refs='heads/*' --name-only "$_full_sha")
     local _abbr_sha=${_full_sha:0:7}
     local _abbr_name=$_full_name
     local _prefix="remotes/origin/"
@@ -142,16 +156,17 @@ function curl_upload_build() {
 
 function curl_upload_error() {
     local _message=$(json_escape "$1")
+    local _ci=$(get_ci)
     local _authorization=$(get_authorization)
     local _content_type=$(get_error_content_type)
     local _user_agent=$(get_user_agent)
     local _url=$(make_error_url)
 
-    curl --silent                                   \
-        --data "{\"message\":\"${_message}\"}"      \
-        --header "Authorization: $_authorization"   \
-        --header "Content-Type: $_content_type"     \
-        --header "User-Agent: $_user_agent"         \
+    curl --silent                                                   \
+        --data "{\"message\":\"${_message}\",\"ci\":\"${_ci}\"}"    \
+        --header "Authorization: $_authorization"                   \
+        --header "Content-Type: $_content_type"                     \
+        --header "User-Agent: $_user_agent"                         \
         "$_url" &>/dev/null
 }
 
@@ -172,9 +187,9 @@ EOF
 }
 
 function display_version() {
-    local _platform=$(get_platform)
+    waldo_platform=$(get_platform)
 
-    echo "Waldo CLI $waldo_cli_version ($_platform)"
+    echo "Waldo CLI $waldo_cli_version ($waldo_platform)"
 }
 
 function fail() {
@@ -213,6 +228,14 @@ function get_build_content_type() {
         app) echo "application/zip" ;;
         *)   echo "application/octet-stream" ;;
     esac
+}
+
+function get_ci() {
+    if [[ ${BITRISE_IO:-false} == true ]]; then
+        echo "bitrise"
+    else
+        echo "unknown"
+    fi
 }
 
 function get_error_content_type() {
@@ -286,6 +309,10 @@ function upload_build() {
             ([[ -d $waldo_build_path ]] && [[ -r $waldo_build_path ]])  \
                 || fail "Unable to read build at ‘${waldo_build_path}’"
 
+            if [[ -z $(which zip) ]]; then
+                fail "No ‘zip’ command found"
+            fi
+
             waldo_upload_path=$_working_path/$_build_name.zip
 
             (cd "$_parent_path" &>/dev/null && zip -qry "$waldo_upload_path" "$_build_name") || exit
@@ -326,7 +353,7 @@ function upload_build() {
 }
 
 function websafe_base64_encode() {
-    base64 | tr -d '=' | tr '/+' '_-'
+    base64 | tr -d '=\n' | tr '/+' '_-'
 }
 
 display_version
@@ -376,6 +403,7 @@ while (( $# )); do
     shift
 done
 
+check_platform || exit
 check_build_path || exit
 check_history || exit
 check_upload_token || exit
