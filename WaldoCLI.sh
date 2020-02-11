@@ -4,11 +4,12 @@ set -eu -o pipefail
 
 waldo_api_build_endpoint=${WALDO_API_BUILD_ENDPOINT:-https://api.waldo.io/versions}
 waldo_api_error_endpoint=${WALDO_API_ERROR_ENDPOINT:-https://api.waldo.io/uploadError}
-waldo_cli_version="1.4.1"
+waldo_cli_version="1.4.2"
 
 waldo_build_flavor=""
 waldo_build_path=""
 waldo_build_suffix=""
+waldo_current_commit=""
 waldo_extra_args="--show-error --silent"
 waldo_history=""
 waldo_history_error=""
@@ -53,25 +54,25 @@ function check_build_path() {
 }
 
 function check_history() {
-    if [[ -z $(which git) ]]; then
-        waldo_history_error="noGitCommandFound"
-    elif [[ -z $(which base64) ]]; then
+    if [[ -z $(which base64) ]]; then
         waldo_history_error="noBase64CommandFound"
+    elif [[ -z $(which cut) ]]; then
+        waldo_history_error="noCutCommandFound"
+    elif [[ -z $(which git) ]]; then
+        waldo_history_error="noGitCommandFound"
+    elif [[ -z $(which grep) ]]; then
+        waldo_history_error="noGrepCommandFound"
     elif [[ -z $(which tr) ]]; then
         waldo_history_error="noTr64CommandFound"
     elif ! git rev-parse >& /dev/null; then
         waldo_history_error="notGitRepository"
     else
+        waldo_current_commit=$(get_current_commit)
         waldo_history=$(get_history)
     fi
 }
 
 function check_platform() {
-#    case "$waldo_platform" in
-#        Linux|macOS) ;;
-#        *) fail "Platform ‘${waldo_platform}’ is not supported" ;;
-#    esac
-
     if [[ -z $(which curl) ]]; then
         fail "No ‘curl’ command found"
     fi
@@ -238,12 +239,16 @@ function get_ci() {
     fi
 }
 
+function get_current_commit() {
+    git log --decorate=full --format='%H %D' -50 | grep -F -m1 refs/remotes | cut -d' ' -f1
+}
+
 function get_error_content_type() {
     echo "application/json"
 }
 
 function get_history() {
-    local _shas=$(git log --format=%H -50)
+    local _shas=$(git log --format='%H' -50)
     local _history=$(convert_shas $_shas)
 
     echo "[${_history}]" | websafe_base64_encode
@@ -275,9 +280,15 @@ function json_escape() {
 function make_build_url() {
     local _query=
 
+    if [[ -n $waldo_current_commit ]]; then
+        _query+="&currentCommit=$waldo_current_commit"
+    fi
+
     if [[ -n $waldo_history ]]; then
         _query+="&history=$waldo_history"
-    elif [[ -n $waldo_history_error ]]; then
+    fi
+
+    if [[ -n $waldo_history_error ]]; then
         _query+="&historyError=$waldo_history_error"
     fi
 

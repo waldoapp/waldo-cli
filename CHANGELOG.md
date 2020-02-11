@@ -7,6 +7,13 @@ This project adheres to [Semantic Versioning].
 
 ## [Unreleased]
 
+## [1.4.2] - 2020-02-11
+
+### Added
+
+- Added support for uploading the current git commit SHA associated with a
+  build if the script is executed from a git repository.
+
 ## [1.4.1] - 2020-02-06
 
 ### Fixed
@@ -64,7 +71,8 @@ This project adheres to [Semantic Versioning].
 
 Initial public release.
 
-[Unreleased]:   https://github.com/waldoapp/waldo-cli/compare/1.4.1...HEAD
+[Unreleased]:   https://github.com/waldoapp/waldo-cli/compare/1.4.2...HEAD
+[1.4.2]:        https://github.com/waldoapp/waldo-cli/compare/1.4.1...1.4.2
 [1.4.1]:        https://github.com/waldoapp/waldo-cli/compare/1.4.0...1.4.1
 [1.4.0]:        https://github.com/waldoapp/waldo-cli/compare/1.3.0...1.4.0
 [1.3.0]:        https://github.com/waldoapp/waldo-cli/compare/1.2.1...1.3.0
