@@ -7,6 +7,17 @@ This project adheres to [Semantic Versioning].
 
 ## [Unreleased]
 
+## [1.6.0] - 2020-06-01
+
+### Added
+
+- Added support for optionally finding and uploading symbols associated with
+  iOS simulator builds
+
+### Changed
+
+- Updated `CI_INTEGRATION.md` document.
+
 ## [1.5.0] - 2020-04-14
 
 ### Added
@@ -82,7 +93,8 @@ This project adheres to [Semantic Versioning].
 
 Initial public release.
 
-[Unreleased]:   https://github.com/waldoapp/waldo-cli/compare/1.5.0...HEAD
+[Unreleased]:   https://github.com/waldoapp/waldo-cli/compare/1.6.0...HEAD
+[1.6.0]:        https://github.com/waldoapp/waldo-cli/compare/1.5.0...1.6.0
 [1.5.0]:        https://github.com/waldoapp/waldo-cli/compare/1.4.2...1.5.0
 [1.4.2]:        https://github.com/waldoapp/waldo-cli/compare/1.4.1...1.4.2
 [1.4.1]:        https://github.com/waldoapp/waldo-cli/compare/1.4.0...1.4.1

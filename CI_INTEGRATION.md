@@ -1,134 +1,12 @@
 # CI Integration
 
-## Uploading a Build with App Center
-
-Waldo integration with [App Center](https://appcenter.ms) requires you only to
-add a couple of [custom build
-steps](https://docs.microsoft.com/en-us/appcenter/build/custom/scripts/).
-
-Add the following to `appcenter-post-clone.sh`:
-
-```bash
-WALDO_CLI_BIN=/usr/local/bin                                # or wherever you prefer
-
-curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.2.1/waldo > "$WALDO_CLI_BIN"/waldo
-chmod +x "$WALDO_CLI_BIN"/waldo
-```
-
-Add the following to `appcenter-post-build.sh`:
-
-```bash
-WALDO_CLI_BIN=/usr/local/bin                                # or wherever you prefer
-
-export WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef  # set to your real upload token
-
-BUILD_PATH=$APPCENTER_OUTPUT_DIRECTORY/YourApp.apk          # for Android
-BUILD_PATH=$APPCENTER_OUTPUT_DIRECTORY/YourApp.ipa          # for iOS
-
-"$WALDO_CLI_BIN"/waldo "$BUILD_PATH"
-```
-
-## Uploading a Build with Bitrise
-
-Waldo integration with [Bitrise](https://www.bitrise.io) requires you only to
-add a [custom `Script`
-step](https://devcenter.bitrise.io/tips-and-tricks/install-additional-tools/)
-to your workflow containing the following:
-
-```bash
-#!/bin/bash
-
-set -ex
-
-WALDO_CLI_BIN=/usr/local/bin                        # or wherever you prefer
-
-if [ ! -e "$WALDO_CLI_BIN"/waldo ]; then
-  curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.2.1/waldo > "$WALDO_CLI_BIN"/waldo
-  chmod +x "$WALDO_CLI_BIN"/waldo
-fi
-
-export WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef  # set to your real upload token
-
-BUILD_PATH=$BITRISE_APK_PATH                                # for Android
-BUILD_PATH=$BITRISE_IPA_PATH                                # for iOS
-
-"$WALDO_CLI_BIN"/waldo "$BUILD_PATH"
-```
-
-## Uploading a Build with CircleCI
-
-Waldo integration with [CircleCI](https://circleci.com) requires you only to
-add a couple of steps to your
-[configuration](https://circleci.com/docs/2.0/configuration-reference/):
-
-```yaml
-jobs:
-  build:    # or whatever name you choose
-    steps:
-      - run:
-        name: Download Waldo CLI
-        command: |
-          curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.2.1/waldo > .circleci/waldo
-
-      #...
-      #... (build steps)
-      #...
-
-      - run:
-        name: Upload build to Waldo
-        command: .circleci/waldo "$WALDO_BUILD_PATH"
-        environment:
-          WALDO_UPLOAD_TOKEN: 0123456789abcdef0123456789abcdef  # set to your real upload token
-          WALDO_BUILD_PATH: /path/to/YourApp.ipa                # set to your real build path
-```
-
-## Uploading a Build with Travis CI
-
-Waldo integration with [Travis CI](https://travis-ci.com) requires you only to
-add a few steps to your [.travis.yml](https://docs.travis-ci.com):
-
-```yaml
-env:
-  global:
-    - WALDO_CLI_BIN=/usr/local/bin                          # or wherever you prefer
-    - WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef   # set to your real upload token
-    - WALDO_BUILD_PATH=/path/to/YourApp.ipa                 # set to your real build path
-
-install:
-  - curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.2.1/waldo > "$WALDO_CLI_BIN"/waldo
-  - chmod +x "$WALDO_CLI_BIN"/waldo
-
-script:
-  - "$WALDO_CLI_BIN"/waldo "$WALDO_BUILD_PATH"
-```
-
 ## Uploading a Build with fastlane
 
 Waldo integration with [fastlane](https://fastlane.tools) requires you only to
 add the `waldo` plugin to your project:
 
 ```bash
-fastlane add_plugin waldo
-```
-
-### Uploading an iOS Device Build
-
-Build a new IPA for your app. If you use `gym` (aka `build_ios_app`) to build
-your IPA, `waldo` will automatically find and upload the generated IPA.
-
-```ruby
-gym(export_method: 'development')                       # or 'ad-hoc'
-waldo(upload_token: '0123456789abcdef0123456789abcdef')
-```
-
-> **Note:** You _must_ specify the Waldo upload token.
-
-If you do _not_ use `gym` to build your IPA, you will need to explicitly
-specify the IPA path to `waldo`:
-
-```ruby
-waldo(ipa_path: '/path/to/YourApp.ipa',
-      upload_token: '0123456789abcdef0123456789abcdef')
+$ fastlane add_plugin waldo
 ```
 
 ### Uploading an iOS Simulator Build
@@ -148,18 +26,43 @@ gym(configuration: 'Release',
 ```
 
 You can then find your app relative to the derived data path in the
-`./Build/Products/Release-iphonesimulator` directory.
+`Build/Products/Release-iphonesimulator` directory.
 
 Regardless of how you create the actual simulator build for your app, the
 upload itself is very simple:
 
 ```ruby
-waldo(app_path: '/path/to/YourApp.app',
-      upload_token: '0123456789abcdef0123456789abcdef')
+waldo(upload_token: '0123456789abcdef0123456789abcdef',
+      app_path: '/path/to/YourApp.app',
+      include_symbols: true)
 ```
 
-> **Note:** You _must_ specify _both_ the path of the `.app` _and_ the Waldo
-> upload token.
+> **Note:** You _must_ specify _both_ the Waldo upload token _and_ the path of
+> the `.app`. The `include_symbols` parameter is optional but we highly
+> recommend supplying it.
+
+### Uploading an iOS Device Build
+
+Build a new IPA for your app. If you use `gym` (aka `build_ios_app`) to build
+your IPA, `waldo` will automatically find and upload the generated IPA.
+
+```ruby
+gym(export_method: 'ad-hoc')                            # or 'development'
+waldo(upload_token: '0123456789abcdef0123456789abcdef',
+      dsym_path: lane_context[SharedValues::DSYM_OUTPUT_PATH])
+```
+
+> **Note:** You _must_ specify the Waldo upload token. The `dsym_path`
+> parameter is optional but we highly recommend supplying it.
+
+If you do _not_ use `gym` to build your IPA, you will need to explicitly
+specify the IPA path to `waldo`:
+
+```ruby
+waldo(upload_token: '0123456789abcdef0123456789abcdef',
+      ipa_path: '/path/to/YourApp.ipa',
+      dsym_path: '/path/to/YourApp.app.dSYM.zip')
+```
 
 ### Uploading an Android Build
 
@@ -178,51 +81,453 @@ If you do _not_ use `gradle` to build your APK, you will need to explicitly
 specify the APK path to `waldo`:
 
 ```ruby
-waldo(apk_path: '/path/to/YourApp.apk',
-      upload_token: '0123456789abcdef0123456789abcdef')
+waldo(upload_token: '0123456789abcdef0123456789abcdef',
+      apk_path: '/path/to/YourApp.apk')
 ```
 
-## Uploading a Build Manually
+----------
 
-For the pain-lovers out there, you can also upload your iOS or Android build
-_manually_ using `curl`. This is _not_ recommended because there are several
-options to the `curl` command that must be specified _exactly_ for the build to
-be accepted.
+## Uploading a Build with App Center
 
-### Uploading an iOS Device Build
+Waldo integration with [App Center](https://appcenter.ms) requires you only to
+add a couple of [custom build
+steps](https://docs.microsoft.com/en-us/appcenter/build/custom/scripts/).
+
+In all cases, add the following to `appcenter-post-clone.sh`:
 
 ```bash
-$ UPLOAD_TOKEN=0123456789abcdef0123456789abcdef # set to your real upload token
-$ BUILD_PATH=/path/to/YourApp.ipa               # set to your real build path
-$ curl --data-binary @"$BUILD_PATH"                     \
-       -H "Authorization: Upload-Token $UPLOAD_TOKEN"   \
-       -H "Content-Type: application/octet-stream"      \
-       -H "User-Agent: Waldo CLI/iOS v1.2.1"            \
-       https://api.waldo.io/versions
+WALDO_CLI_BIN=/usr/local/bin
+
+curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.5.0/waldo > ${WALDO_CLI_BIN}/waldo
+chmod +x ${WALDO_CLI_BIN}/waldo
 ```
 
 ### Uploading an iOS Simulator Build
 
+Add the following to `appcenter-post-build.sh`:
+
 ```bash
-$ UPLOAD_TOKEN=0123456789abcdef0123456789abcdef # set to your real upload token
-$ BUILD_PATH=/path/to/YourApp.app.zip           # set to your real build path
-$ curl --data-binary @"$BUILD_PATH"                     \
-       -H "Authorization: Upload-Token $UPLOAD_TOKEN"   \
-       -H "Content-Type: application/zip"               \
-       -H "User-Agent: Waldo CLI/iOS v1.2.1"            \
-       https://api.waldo.io/versions
+WALDO_CLI_BIN=/usr/local/bin
+
+export WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
+
+BUILD_PATH=$APPCENTER_OUTPUT_DIRECTORY/YourApp.app
+
+${WALDO_CLI_BIN}/waldo "$BUILD_PATH" --include-symbols
 ```
 
-> **Note:** You _must_ zip the simulator app bundle before uploading.
+> **Note:** The `--include-symbols` option is optional but we highly recommend
+> supplying it.
+
+### Uploading an iOS Device Build
+
+Add the following to `appcenter-post-build.sh`:
+
+```bash
+WALDO_CLI_BIN=/usr/local/bin
+
+export WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
+
+BUILD_PATH=$APPCENTER_OUTPUT_DIRECTORY/YourApp.ipa
+DSYM_PATH=???
+
+${WALDO_CLI_BIN}/waldo "$BUILD_PATH" "$DSYM_PATH"
+```
+
+> **Note:** The `DSYM_PATH` parameter is optional but we highly recommend
+> supplying it.
 
 ### Uploading an Android Build
 
+Add the following to `appcenter-post-build.sh`:
+
 ```bash
-$ UPLOAD_TOKEN=0123456789abcdef0123456789abcdef # set to your real upload token
-$ BUILD_PATH=/path/to/YourApp.apk               # set to your real build path
-$ curl --data-binary @"$BUILD_PATH"                     \
-       -H "Authorization: Upload-Token $UPLOAD_TOKEN"   \
-       -H "Content-Type: application/octet-stream"      \
-       -H "User-Agent: Waldo CLI/Android v1.2.1"        \
-       https://api.waldo.io/versions
+WALDO_CLI_BIN=/usr/local/bin
+
+export WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
+
+BUILD_PATH=$APPCENTER_OUTPUT_DIRECTORY/YourApp.apk
+
+${WALDO_CLI_BIN}/waldo "$BUILD_PATH"
+```
+
+----------
+
+## Uploading a Build with Bitrise
+
+### Uploading an iOS Simulator Build
+
+Waldo integration with [Bitrise](https://www.bitrise.io) requires you only to
+add a [custom `Script`
+step](https://devcenter.bitrise.io/tips-and-tricks/install-additional-tools/)
+to your workflow containing the following:
+
+```bash
+#!/bin/bash
+
+set -ex
+
+WALDO_CLI_BIN=/usr/local/bin
+
+if [ ! -e ${WALDO_CLI_BIN}/waldo ]; then
+  curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.5.0/waldo > ${WALDO_CLI_BIN}/waldo
+  chmod +x ${WALDO_CLI_BIN}/waldo
+fi
+
+export WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
+
+${WALDO_CLI_BIN}/waldo "$BITRISE_APP_DIR_PATH" --include-symbols
+```
+
+> **Note:** The `--include-symbols` option is optional but we highly recommend
+> supplying it.
+
+### Uploading an iOS Device Build
+
+Waldo integration with [Bitrise](https://www.bitrise.io) requires you only to
+add a [custom `Script`
+step](https://devcenter.bitrise.io/tips-and-tricks/install-additional-tools/)
+to your workflow containing the following:
+
+```bash
+#!/bin/bash
+
+set -ex
+
+WALDO_CLI_BIN=/usr/local/bin
+
+if [ ! -e ${WALDO_CLI_BIN}/waldo ]; then
+  curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.0/waldo > ${WALDO_CLI_BIN}/waldo
+  chmod +x ${WALDO_CLI_BIN}/waldo
+fi
+
+export WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
+
+${WALDO_CLI_BIN}/waldo "$BITRISE_IPA_PATH" "$BITRISE_DSYM_PATH"
+```
+
+> **Note:** The `BITRISE_DSYM_PATH` parameter is optional but we highly
+> recommend supplying it.
+
+### Uploading an Android Build
+
+Waldo integration with [Bitrise](https://www.bitrise.io) requires you only to
+add a [custom `Script`
+step](https://devcenter.bitrise.io/tips-and-tricks/install-additional-tools/)
+to your workflow containing the following:
+
+```bash
+#!/bin/bash
+
+set -ex
+
+WALDO_CLI_BIN=/usr/local/bin
+
+if [ ! -e ${WALDO_CLI_BIN}/waldo ]; then
+  curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.0/waldo > ${WALDO_CLI_BIN}/waldo
+  chmod +x ${WALDO_CLI_BIN}/waldo
+fi
+
+export WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
+
+${WALDO_CLI_BIN}/waldo "$BITRISE_APK_PATH"
+```
+
+----------
+
+## Uploading a Build with BuddyBuild
+
+Waldo integration with [BuddyBuild](https://www.buddybuild.com) requires you
+only to add a couple of [custom build
+steps](https://docs.buddybuild.com/builds/custom_build_steps.html).
+
+In all cases, add the following to `buddybuild_postclone.sh`:
+
+```bash
+WALDO_CLI_BIN=/usr/local/bin
+
+curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.0/waldo > ${WALDO_CLI_BIN}/waldo
+chmod +x ${WALDO_CLI_BIN}/waldo
+```
+
+### Uploading an iOS Simulator Build
+
+Add the following to `buddybuild_postbuild.sh`:
+
+```bash
+WALDO_CLI_BIN=/usr/local/bin
+
+export WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
+
+BUILD_PATH=$BUDDYBUILD_PRODUCT_DIR/???
+
+${WALDO_CLI_BIN}/waldo "$BUILD_PATH" --include-symbols
+```
+
+> **Note:** The `--include-symbols` option is optional but we highly recommend
+> supplying it.
+
+### Uploading an iOS Device Build
+
+Add the following to `buddybuild_postbuild.sh`:
+
+```bash
+WALDO_CLI_BIN=/usr/local/bin
+
+export WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
+
+BUILD_PATH=$BUDDYBUILD_PRODUCT_DIR/???
+DSYM_PATH=$BUDDYBUILD_PRODUCT_DIR/???
+
+${WALDO_CLI_BIN}/waldo "$BUILD_PATH" "$DSYM_PATH"
+```
+
+> **Note:** The `DSYM_PATH` parameter is optional but we highly recommend
+> supplying it.
+
+### Uploading an Android Build
+
+_Not supported by the CI._
+
+----------
+
+## Uploading a Build with CircleCI
+
+### Uploading an iOS Simulator Build
+
+Waldo integration with [CircleCI](https://circleci.com) requires you only to
+add a couple of steps to your
+[configuration](https://circleci.com/docs/2.0/configuration-reference/):
+
+```yaml
+jobs:
+  build:
+    steps:
+      - run:
+        name: Download Waldo CLI
+        command: |
+          curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.0/waldo > .circleci/waldo
+          chmod +x .circleci/waldo
+
+      #...
+      #... (generate .app and associated .dSYM)
+      #...
+
+      - run:
+        name: Upload build to Waldo
+        command: .circleci/waldo "$WALDO_BUILD_PATH" --include-symbols
+        environment:
+          WALDO_UPLOAD_TOKEN: 0123456789abcdef0123456789abcdef
+          WALDO_BUILD_PATH: /path/to/YourApp.app
+```
+
+> **Note:** The `--include-symbols` option is optional but we highly recommend
+> supplying it.
+
+### Uploading an iOS Device Build
+
+Waldo integration with [CircleCI](https://circleci.com) requires you only to
+add a couple of steps to your
+[configuration](https://circleci.com/docs/2.0/configuration-reference/):
+
+```yaml
+jobs:
+  build:
+    steps:
+      - run:
+        name: Download Waldo CLI
+        command: |
+          curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.0/waldo > .circleci/waldo
+          chmod +x .circleci/waldo
+
+      #...
+      #... (generate .ipa and associated .dSYM)
+      #...
+
+      - run:
+        name: Upload build to Waldo
+        command: .circleci/waldo "$WALDO_BUILD_PATH" "$WALDO_DSYM_PATH"
+        environment:
+          WALDO_UPLOAD_TOKEN: 0123456789abcdef0123456789abcdef
+          WALDO_BUILD_PATH: /path/to/YourApp.ipa
+          WALDO_DSYM_PATH: /path/to/YourApp.app.dSYM.zip
+```
+
+> **Note:** The `WALDO_DSYM_PATH` parameter is optional but we highly recommend
+> supplying it.
+
+### Uploading an Android Build
+
+Waldo integration with [CircleCI](https://circleci.com) requires you only to
+add a couple of steps to your
+[configuration](https://circleci.com/docs/2.0/configuration-reference/):
+
+```yaml
+jobs:
+  build:
+    steps:
+      - run:
+        name: Download Waldo CLI
+        command: |
+          curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.0/waldo > .circleci/waldo
+          chmod +x .circleci/waldo
+
+      #...
+      #... (generate .apk)
+      #...
+
+      - run:
+        name: Upload build to Waldo
+        command: .circleci/waldo "$WALDO_BUILD_PATH"
+        environment:
+          WALDO_UPLOAD_TOKEN: 0123456789abcdef0123456789abcdef
+          WALDO_BUILD_PATH: /path/to/YourApp.apk
+```
+
+----------
+
+## Uploading a Build with Travis CI
+
+### Uploading an iOS Simulator Build
+
+Waldo integration with [Travis CI](https://travis-ci.com) requires you only to
+add a few steps to your [.travis.yml](https://docs.travis-ci.com):
+
+```yaml
+env:
+  global:
+    - WALDO_CLI_BIN=/usr/local/bin
+    - WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
+    - WALDO_BUILD_PATH=/path/to/YourApp.app
+
+install:
+  - curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.0/waldo > ${WALDO_CLI_BIN}/waldo
+  - chmod +x ${WALDO_CLI_BIN}/waldo
+
+script:
+  - ${WALDO_CLI_BIN}/waldo "$WALDO_BUILD_PATH" --include-symbols
+```
+
+> **Note:** The `--include-symbols` option is optional but we highly recommend
+> supplying it.
+
+### Uploading an iOS Device Build
+
+Waldo integration with [Travis CI](https://travis-ci.com) requires you only to
+add a few steps to your [.travis.yml](https://docs.travis-ci.com):
+
+```yaml
+env:
+  global:
+    - WALDO_CLI_BIN=/usr/local/bin
+    - WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
+    - WALDO_BUILD_PATH=/path/to/YourApp.ipa
+    - WALDO_DSYM_PATH=/path/to/YourApp.app.dSYM.zip
+
+install:
+  - curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.0/waldo > ${WALDO_CLI_BIN}/waldo
+  - chmod +x ${WALDO_CLI_BIN}/waldo
+
+script:
+  - ${WALDO_CLI_BIN}/waldo "$WALDO_BUILD_PATH" "$WALDO_DSYM_PATH"
+```
+
+> **Note:** The `WALDO_DSYM_PATH` parameter is optional but we highly recommend
+> supplying it.
+
+### Uploading an Android Build
+
+Waldo integration with [Travis CI](https://travis-ci.com) requires you only to
+add a few steps to your [.travis.yml](https://docs.travis-ci.com):
+
+```yaml
+env:
+  global:
+    - WALDO_CLI_BIN=/usr/local/bin
+    - WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
+    - WALDO_BUILD_PATH=/path/to/YourApp.apk
+
+install:
+  - curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.0/waldo > ${WALDO_CLI_BIN}/waldo
+  - chmod +x ${WALDO_CLI_BIN}/waldo
+
+script:
+  - ${WALDO_CLI_BIN}/waldo "$WALDO_BUILD_PATH"
+```
+
+----------
+
+## Uploading a Build Manually
+
+If you are building outside of CI/CD or in another CI provider, you can also
+upload your iOS build manually using Waldo CLI.
+
+### Uploading an iOS Simulator Build
+
+```
+WALDO_CLI_BIN=/usr/local/bin
+
+if [ ! -e ${WALDO_CLI_BIN}/waldo ]; then
+  curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.0/waldo > ${WALDO_CLI_BIN}/waldo
+  chmod +x ${WALDO_CLI_BIN}/waldo
+fi
+
+#...
+#... (generate .app and associated .dSYM)
+#...
+
+export WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
+
+BUILD_PATH=/path/to/YourApp.app
+
+${WALDO_CLI_BIN}/waldo "$BUILD_PATH" --include-symbols
+```
+
+> **Note:** The `--include-symbols` option is optional but we highly recommend
+> supplying it.
+
+### Uploading an iOS Device Build
+
+```
+WALDO_CLI_BIN=/usr/local/bin
+
+if [ ! -e ${WALDO_CLI_BIN}/waldo ]; then
+  curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.0/waldo > ${WALDO_CLI_BIN}/waldo
+  chmod +x ${WALDO_CLI_BIN}/waldo
+fi
+
+#...
+#... (generate .ipa and associated .dSYM)
+#...
+
+export WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
+
+BUILD_PATH=/path/to/YourApp.ipa
+DSYM_PATH=/path/to/YourApp.app.dSYM.zip
+
+${WALDO_CLI_BIN}/waldo "$BUILD_PATH" "$DSYM_PATH"
+```
+
+> **Note:** The `DSYM_PATH` parameter is optional but we highly recommend
+> supplying it.
+
+### Uploading an Android Build
+
+```
+WALDO_CLI_BIN=/usr/local/bin
+
+if [ ! -e ${WALDO_CLI_BIN}/waldo ]; then
+  curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.0/waldo > ${WALDO_CLI_BIN}/waldo
+  chmod +x ${WALDO_CLI_BIN}/waldo
+fi
+
+#...
+#... (generate .apk)
+#...
+
+export WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
+
+BUILD_PATH=/path/to/YourApp.apk
+
+${WALDO_CLI_BIN}/waldo "$BUILD_PATH"
 ```

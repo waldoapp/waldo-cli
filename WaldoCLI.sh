@@ -5,7 +5,7 @@ set -eu -o pipefail
 waldo_api_build_endpoint=${WALDO_API_BUILD_ENDPOINT:-https://api.waldo.io/versions}
 waldo_api_error_endpoint=${WALDO_API_ERROR_ENDPOINT:-https://api.waldo.io/uploadError}
 waldo_api_symbols_endpoint=${WALDO_API_SYMBOLS_ENDPOINT:-https://api.waldo.io/versions/__ID__/symbols}
-waldo_cli_version="1.5.0"
+waldo_cli_version="1.6.0"
 
 waldo_build_flavor=""
 waldo_build_path=""
@@ -15,6 +15,7 @@ waldo_build_upload_id=""
 waldo_extra_args="--show-error --silent"
 waldo_history=""
 waldo_history_error=""
+waldo_include_symbols="false"
 waldo_platform=""
 waldo_symbols_path=""
 waldo_symbols_payload_path=""
@@ -103,14 +104,24 @@ function check_platform() {
 }
 
 function check_symbols_path() {
+    case $waldo_build_suffix in
+        app)
+            if [[ -z $waldo_symbols_path && $waldo_include_symbols == "true" ]]; then
+                waldo_symbols_path=$(find_symbols_path)
+            fi
+            ;;
+        ipa) ;;
+        *) waldo_symbols_path="" ;; # not applicable
+    esac
+
     [[ -n $waldo_symbols_path ]] || return 0
 
     waldo_symbols_path=$(abs_path "$waldo_symbols_path")
     waldo_symbols_suffix=${waldo_symbols_path##*.}
 
     case $waldo_symbols_suffix in
-        xcarchive|zip) ;;   # OK
-        *)             fail "File extension of symbols at ‘${waldo_symbols_path}’ is not recognized" ;;
+        dSYM|xcarchive|zip) ;;  # OK
+        *)                  fail "File extension of symbols at ‘${waldo_symbols_path}’ is not recognized" ;;
     esac
 }
 
@@ -175,20 +186,20 @@ function create_build_payload() {
 
     case $waldo_build_suffix in
         app)
-            ([[ -d $waldo_build_path ]] && [[ -r $waldo_build_path ]])  \
+            ([[ -d $waldo_build_path && -r $waldo_build_path ]])  \
                 || fail "Unable to read build at ‘${waldo_build_path}’"
 
             if [[ -z $(which zip) ]]; then
                 fail "No ‘zip’ command found"
             fi
 
-            waldo_build_payload_path="$waldo_working_path"/"$_build_name.zip"
+            waldo_build_payload_path="$waldo_working_path"/"$_build_name".zip
 
             (cd "$_parent_path" &>/dev/null && zip -qry "$waldo_build_payload_path" "$_build_name") || return
             ;;
 
         *)
-            ([[ -f $waldo_build_path ]] && [[ -r $waldo_build_path ]])  \
+            ([[ -f $waldo_build_path && -r $waldo_build_path ]])  \
                 || fail "Unable to read build at ‘${waldo_build_path}’"
 
             waldo_build_payload_path=$waldo_build_path
@@ -199,11 +210,25 @@ function create_build_payload() {
 function create_symbols_payload() {
     [[ -n $waldo_symbols_path ]] || return 0
 
+    local _parent_path=$(dirname "$waldo_symbols_path")
     local _symbols_name=$(basename "$waldo_symbols_path")
 
     case $waldo_symbols_suffix in
+        dSYM)
+            ([[ -d $waldo_symbols_path && -r $waldo_symbols_path ]])  \
+                || fail "Unable to read symbols at ‘${waldo_symbols_path}’"
+
+            if [[ -z $(which zip) ]]; then
+                fail "No ‘zip’ command found"
+            fi
+
+            waldo_symbols_payload_path="$waldo_working_path"/"$_symbols_name".zip
+
+            (cd "$_parent_path" &>/dev/null && zip -qry "$waldo_symbols_payload_path" "$_symbols_name") || return
+            ;;
+
         xcarchive)
-            ([[ -d $waldo_symbols_path ]] && [[ -r $waldo_symbols_path ]])  \
+            ([[ -d $waldo_symbols_path && -r $waldo_symbols_path ]])  \
                 || fail "Unable to read symbols at ‘${waldo_symbols_path}’"
 
             if [[ -z $(which zip) ]]; then
@@ -223,7 +248,7 @@ function create_symbols_payload() {
             ;;
 
         *)
-            ([[ -f $waldo_symbols_path ]] && [[ -r $waldo_symbols_path ]])  \
+            ([[ -f $waldo_symbols_path && -r $waldo_symbols_path ]])  \
                 || fail "Unable to read symbols at ‘${waldo_symbols_path}’"
 
             waldo_symbols_payload_path=$waldo_symbols_path
@@ -304,6 +329,21 @@ function delete_working_path() {
     fi
 }
 
+function display_summary() {
+    echo ""
+    echo "Build path:   $(summarize "$waldo_build_path")"
+    echo "Symbols path: $(summarize "$waldo_symbols_path")"
+    echo "Variant name: $(summarize "$waldo_variant_name")"
+    echo "Upload token: $(summarize_secure "$waldo_upload_token")"
+    echo ""
+
+    if [[ $waldo_extra_args == "--verbose" ]]; then
+        echo "Build payload path:   $(summarize "$waldo_build_payload_path")"
+        echo "Symbols payload path: $(summarize "$waldo_symbols_payload_path")"
+        echo ""
+    fi
+}
+
 function display_usage() {
     cat <<EOF
 
@@ -314,6 +354,7 @@ USAGE: waldo [options] <build-path> [<symbols-path>]
 OPTIONS:
 
   --help                  Display available options
+  --include_symbols       Include symbols with the build upload
   --upload_token <value>  Waldo upload token
   --variant_name <value>  Waldo variant name
   --verbose               Display extra verbiage
@@ -351,6 +392,14 @@ function fail_usage() {
     echo "waldo: $1" 1>&2
     display_usage
     exit 1
+}
+
+function find_symbols_path() {
+    if [[ -e ${waldo_build_path}.dSYM.zip ]]; then
+        echo "${waldo_build_path}.dSYM.zip"
+    elif [[ -e ${waldo_build_path}.dSYM ]]; then
+        echo "${waldo_build_path}.dSYM"
+    fi
 }
 
 function get_authorization() {
@@ -440,6 +489,30 @@ function make_symbols_url() {
     echo "${waldo_api_symbols_endpoint/__ID__/$waldo_build_upload_id}"
 }
 
+function summarize() {
+    local _value=$1
+
+    if [[ -n $_value ]]; then
+        echo "‘${_value}’"
+    else
+        echo "(none)"
+    fi
+}
+
+function summarize_secure() {
+    local _value=$1
+
+    if [[ $waldo_extra_args != "--verbose" ]]; then
+        local _prefix=${_value:0:6}
+        local _suffix_len=$(( ${#_value} - ${#_prefix} ))
+        local _secure='********************************'
+
+        _value="${_prefix}${_secure:0:$_suffix_len}"
+    fi
+
+    summarize "$_value"
+}
+
 function upload_build() {
     local _build_name=$(basename "$waldo_build_path")
 
@@ -454,9 +527,10 @@ function upload_build() {
     local _curl_status=$?
     local _response=$(cat "$_response_path" 2>/dev/null)
 
-    [[ $waldo_extra_args == "--verbose" ]] && echo "$_response"
-
-    [[ $waldo_extra_args == "--verbose" ]] && echo ""
+    if [[ $waldo_extra_args == "--verbose" ]]; then
+        echo "$_response"
+        echo ""
+    fi
 
     check_build_status "$_response"
 
@@ -481,9 +555,10 @@ function upload_symbols() {
     local _curl_status=$?
     local _response=$(cat "$_response_path" 2>/dev/null)
 
-    [[ $waldo_extra_args == "--verbose" ]] && echo "$_response"
-
-    [[ $waldo_extra_args == "--verbose" ]] && echo ""
+    if [[ $waldo_extra_args == "--verbose" ]]; then
+        echo "$_response"
+        echo ""
+    fi
 
     check_symbols_status "$_response"
 
@@ -503,6 +578,10 @@ while (( $# )); do
         --help)
             display_usage
             exit
+            ;;
+
+        --include_symbols)
+            waldo_include_symbols="true"
             ;;
 
         --upload_token)
@@ -556,6 +635,8 @@ create_working_path || exit
 
 create_build_payload || exit
 create_symbols_payload || exit
+
+display_summary
 
 upload_build || exit
 upload_symbols || exit
