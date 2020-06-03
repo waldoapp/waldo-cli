@@ -5,7 +5,7 @@ set -eu -o pipefail
 waldo_api_build_endpoint=${WALDO_API_BUILD_ENDPOINT:-https://api.waldo.io/versions}
 waldo_api_error_endpoint=${WALDO_API_ERROR_ENDPOINT:-https://api.waldo.io/uploadError}
 waldo_api_symbols_endpoint=${WALDO_API_SYMBOLS_ENDPOINT:-https://api.waldo.io/versions/__ID__/symbols}
-waldo_cli_version="1.6.0"
+waldo_cli_version="1.6.1"
 
 waldo_build_flavor=""
 waldo_build_path=""
@@ -15,7 +15,7 @@ waldo_build_upload_id=""
 waldo_extra_args="--show-error --silent"
 waldo_history=""
 waldo_history_error=""
-waldo_include_symbols="false"
+waldo_include_symbols=false
 waldo_platform=""
 waldo_symbols_path=""
 waldo_symbols_payload_path=""
@@ -106,7 +106,7 @@ function check_platform() {
 function check_symbols_path() {
     case $waldo_build_suffix in
         app)
-            if [[ -z $waldo_symbols_path && $waldo_include_symbols == "true" ]]; then
+            if [[ -z $waldo_symbols_path && $waldo_include_symbols == true ]]; then
                 waldo_symbols_path=$(find_symbols_path)
             fi
             ;;
@@ -355,8 +355,8 @@ OPTIONS:
 
   --help                  Display available options
   --include_symbols       Include symbols with the build upload
-  --upload_token <value>  Waldo upload token
-  --variant_name <value>  Waldo variant name
+  --upload_token <value>  Waldo upload token (overrides WALDO_UPLOAD_TOKEN)
+  --variant_name <value>  Waldo variant name (overrides WALDO_VARIANT_NAME)
   --verbose               Display extra verbiage
 EOF
 }
@@ -414,10 +414,18 @@ function get_build_content_type() {
 }
 
 function get_ci() {
-    if [[ ${BITRISE_IO:-false} == true ]]; then
-        echo "bitrise"
+    if [[ -n ${APPCENTER_BUILD_ID:-} ]]; then
+        echo "App Center"
+    elif [[ ${BITRISE_IO:-false} == true ]]; then
+        echo "Bitrise"
+    elif [[ -n ${BUDDYBUILD_BUILD_ID:-} ]]; then
+        echo "buddybuild"
+    elif [[ ${CIRCLECI:-false} == true ]]; then
+        echo "CircleCI"
+    elif [[ ${TRAVIS:-false} == true ]]; then
+        echo "Travis CI"
     else
-        echo "unknown"
+        echo "CLI"
     fi
 }
 
@@ -446,7 +454,7 @@ function get_symbols_content_type() {
 }
 
 function get_user_agent() {
-    echo "Waldo CLI/$waldo_build_flavor v$waldo_cli_version"
+    echo "Waldo $(get_ci)/${waldo_build_flavor} v${waldo_cli_version}"
 }
 
 function json_escape() {
@@ -581,7 +589,7 @@ while (( $# )); do
             ;;
 
         --include_symbols)
-            waldo_include_symbols="true"
+            waldo_include_symbols=true
             ;;
 
         --upload_token)
