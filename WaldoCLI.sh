@@ -5,7 +5,9 @@ set -eu -o pipefail
 waldo_api_build_endpoint=${WALDO_API_BUILD_ENDPOINT:-https://api.waldo.io/versions}
 waldo_api_error_endpoint=${WALDO_API_ERROR_ENDPOINT:-https://api.waldo.io/uploadError}
 waldo_api_symbols_endpoint=${WALDO_API_SYMBOLS_ENDPOINT:-https://api.waldo.io/versions/__ID__/symbols}
-waldo_cli_version="1.6.1"
+waldo_user_agent_override=${WALDO_USER_AGENT_OVERRIDE:-}
+
+waldo_cli_version="1.6.2"
 
 waldo_build_flavor=""
 waldo_build_path=""
@@ -454,7 +456,11 @@ function get_symbols_content_type() {
 }
 
 function get_user_agent() {
-    echo "Waldo $(get_ci)/${waldo_build_flavor} v${waldo_cli_version}"
+    if [[ -n $waldo_user_agent_override ]]; then
+        echo "$waldo_user_agent_override"
+    else
+        echo "Waldo $(get_ci)/${waldo_build_flavor} v${waldo_cli_version}"
+    fi
 }
 
 function json_escape() {
