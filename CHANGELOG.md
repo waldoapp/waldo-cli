@@ -7,6 +7,13 @@ This project adheres to [Semantic Versioning].
 
 ## [Unreleased]
 
+## [1.6.2] - 2020-10-09
+
+### Changed
+
+- Further enhanced detection and reporting of active CI.
+- Further updated `CI_INTEGRATION.md` document again.
+
 ## [1.6.1] - 2020-06-03
 
 ### Changed
@@ -100,7 +107,8 @@ This project adheres to [Semantic Versioning].
 
 Initial public release.
 
-[Unreleased]:   https://github.com/waldoapp/waldo-cli/compare/1.6.1...HEAD
+[Unreleased]:   https://github.com/waldoapp/waldo-cli/compare/1.6.2...HEAD
+[Unreleased]:   https://github.com/waldoapp/waldo-cli/compare/1.6.1...1.6.2
 [1.6.1]:        https://github.com/waldoapp/waldo-cli/compare/1.6.0...1.6.1
 [1.6.0]:        https://github.com/waldoapp/waldo-cli/compare/1.5.0...1.6.0
 [1.5.0]:        https://github.com/waldoapp/waldo-cli/compare/1.4.2...1.5.0

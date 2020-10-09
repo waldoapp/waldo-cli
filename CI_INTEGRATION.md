@@ -108,7 +108,7 @@ In all cases, add the following to `appcenter-post-clone.sh`:
 ```bash
 WALDO_CLI_BIN=/usr/local/bin
 
-curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.1/waldo > ${WALDO_CLI_BIN}/waldo
+curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.2/waldo > ${WALDO_CLI_BIN}/waldo
 chmod +x ${WALDO_CLI_BIN}/waldo
 ```
 
@@ -152,82 +152,85 @@ ${WALDO_CLI_BIN}/waldo "$BUILD_PATH"
 
 ## Uploading a Build with Bitrise
 
+Waldo integration with [Bitrise](https://www.bitrise.io) requires you only to
+add a [`Waldo Upload`](https://app.bitrise.io/integrations/steps/waldo-upload)
+step to your workflow.
+
 ### Uploading an iOS Simulator Build
 
-Waldo integration with [Bitrise](https://www.bitrise.io) requires you only to
-add a [custom `Script`
-step](https://devcenter.bitrise.io/tips-and-tricks/install-additional-tools/)
-to your workflow containing the following:
+First, create a new simulator build for your app. When you use the [`Xcode
+build for
+simulator`](https://app.bitrise.io/integrations/steps/xcode-build-for-simulator
+) step to build your app, output variables are generated that you can then use
+as input to the [`Waldo
+Upload`](https://app.bitrise.io/integrations/steps/waldo-upload) step to find
+and upload the generated app.
 
-```bash
-#!/bin/bash
-
-set -ex
-
-WALDO_CLI_BIN=/usr/local/bin
-
-if [ ! -e ${WALDO_CLI_BIN}/waldo ]; then
-  curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.1/waldo > ${WALDO_CLI_BIN}/waldo
-  chmod +x ${WALDO_CLI_BIN}/waldo
-fi
-
-export WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
-
-${WALDO_CLI_BIN}/waldo "$BITRISE_APP_DIR_PATH" --include-symbols
+```yaml
+workflows:
+  primary:
+    steps:
+    #...
+    - xcode-build-for-simulator: {}
+    - waldo-upload:
+        inputs:
+        - build_path: $BITRISE_APP_DIR_PATH
+        - upload_token: $WALDO_UPLOAD_TOKEN     # from your secrets
+        - find_symbols: 'yes'
+    #...
 ```
 
-> **Note:** The `--include-symbols` option is optional but we highly recommend
+> **Note:** The `find_symbols` input is optional but we highly recommend
 > supplying it.
 
 ### Uploading an iOS Device Build
 
-Waldo integration with [Bitrise](https://www.bitrise.io) requires you only to
-add a [custom `Script`
-step](https://devcenter.bitrise.io/tips-and-tricks/install-additional-tools/)
-to your workflow containing the following:
+First, build a new IPA for your app. When you use the [`Xcode Archive & Export
+for iOS`](https://app.bitrise.io/integrations/steps/xcode-archive) step to
+build your IPA, output variables are generated that you can then use as input
+to the [`Waldo Upload`](https://app.bitrise.io/integrations/steps/waldo-upload)
+step to find and upload the generated IPA.
 
-```bash
-#!/bin/bash
-
-set -ex
-
-WALDO_CLI_BIN=/usr/local/bin
-
-if [ ! -e ${WALDO_CLI_BIN}/waldo ]; then
-  curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.1/waldo > ${WALDO_CLI_BIN}/waldo
-  chmod +x ${WALDO_CLI_BIN}/waldo
-fi
-
-export WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
-
-${WALDO_CLI_BIN}/waldo "$BITRISE_IPA_PATH" "$BITRISE_DSYM_PATH"
+```yaml
+workflows:
+  primary:
+    steps:
+    #...
+    - xcode-archive:
+        inputs:
+        - export_method: ad-hoc                 # or development
+        - compile_bitcode: 'no'
+        - upload_bitcode: 'no'
+    - waldo-upload:
+        inputs:
+        - build_path: $BITRISE_IPA_PATH
+        - upload_token: $WALDO_UPLOAD_TOKEN     # from your secrets
+        - symbols_path: $BITRISE_DSYM_PATH
+    #...
 ```
 
-> **Note:** The `BITRISE_DSYM_PATH` parameter is optional but we highly
-> recommend supplying it.
+> **Note:** The `symbols_path` input is optional but we highly recommend
+> supplying it.
 
 ### Uploading an Android Build
 
-Waldo integration with [Bitrise](https://www.bitrise.io) requires you only to
-add a [custom `Script`
-step](https://devcenter.bitrise.io/tips-and-tricks/install-additional-tools/)
-to your workflow containing the following:
+First, build a new APK for your app. When you use the [`Android
+Build`](https://app.bitrise.io/integrations/steps/android-build) step to build
+your APK, output variables are generated that you can then use as input to the
+[`Waldo Upload`](https://app.bitrise.io/integrations/steps/waldo-upload) step
+to find and upload the generated APK.
 
-```bash
-#!/bin/bash
-
-set -ex
-
-WALDO_CLI_BIN=/usr/local/bin
-
-if [ ! -e ${WALDO_CLI_BIN}/waldo ]; then
-  curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.1/waldo > ${WALDO_CLI_BIN}/waldo
-  chmod +x ${WALDO_CLI_BIN}/waldo
-fi
-
-export WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
-
-${WALDO_CLI_BIN}/waldo "$BITRISE_APK_PATH"
+```yaml
+workflows:
+  primary:
+    steps:
+    #...
+    - android-build: {}
+    - waldo-upload:
+        inputs:
+        - build_path: $BITRISE_APK_PATH
+        - upload_token: $WALDO_UPLOAD_TOKEN     # from your secrets
+    #...
 ```
 
 ----------
@@ -243,7 +246,7 @@ In all cases, add the following to `buddybuild_postclone.sh`:
 ```bash
 WALDO_CLI_BIN=/usr/local/bin
 
-curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.1/waldo > ${WALDO_CLI_BIN}/waldo
+curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.2/waldo > ${WALDO_CLI_BIN}/waldo
 chmod +x ${WALDO_CLI_BIN}/waldo
 ```
 
@@ -306,7 +309,7 @@ jobs:
       - run:
         name: Download Waldo CLI
         command: |
-          curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.1/waldo > .circleci/waldo
+          curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.2/waldo > .circleci/waldo
           chmod +x .circleci/waldo
 
       #...
@@ -337,7 +340,7 @@ jobs:
       - run:
         name: Download Waldo CLI
         command: |
-          curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.1/waldo > .circleci/waldo
+          curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.2/waldo > .circleci/waldo
           chmod +x .circleci/waldo
 
       #...
@@ -369,7 +372,7 @@ jobs:
       - run:
         name: Download Waldo CLI
         command: |
-          curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.1/waldo > .circleci/waldo
+          curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.2/waldo > .circleci/waldo
           chmod +x .circleci/waldo
 
       #...
@@ -399,7 +402,7 @@ env:
     - WALDO_CLI_BIN=/usr/local/bin
     - WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
 install:
-  - curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.1/waldo > ${WALDO_CLI_BIN}/waldo
+  - curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.2/waldo > ${WALDO_CLI_BIN}/waldo
   - chmod +x ${WALDO_CLI_BIN}/waldo
 script:
   #...
@@ -425,7 +428,7 @@ env:
     - WALDO_CLI_BIN=/usr/local/bin
     - WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
 install:
-  - curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.1/waldo > ${WALDO_CLI_BIN}/waldo
+  - curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.2/waldo > ${WALDO_CLI_BIN}/waldo
   - chmod +x ${WALDO_CLI_BIN}/waldo
 script:
   #...
@@ -453,7 +456,7 @@ env:
     - WALDO_CLI_BIN=/usr/local/bin
     - WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
 install:
-  - curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.1/waldo > ${WALDO_CLI_BIN}/waldo
+  - curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.2/waldo > ${WALDO_CLI_BIN}/waldo
   - chmod +x ${WALDO_CLI_BIN}/waldo
 script:
   #...
@@ -475,7 +478,7 @@ upload your iOS build manually using Waldo CLI.
 WALDO_CLI_BIN=/usr/local/bin
 
 if [ ! -e ${WALDO_CLI_BIN}/waldo ]; then
-  curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.1/waldo > ${WALDO_CLI_BIN}/waldo
+  curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.2/waldo > ${WALDO_CLI_BIN}/waldo
   chmod +x ${WALDO_CLI_BIN}/waldo
 fi
 
@@ -499,7 +502,7 @@ ${WALDO_CLI_BIN}/waldo "$BUILD_PATH" --include-symbols
 WALDO_CLI_BIN=/usr/local/bin
 
 if [ ! -e ${WALDO_CLI_BIN}/waldo ]; then
-  curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.1/waldo > ${WALDO_CLI_BIN}/waldo
+  curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.2/waldo > ${WALDO_CLI_BIN}/waldo
   chmod +x ${WALDO_CLI_BIN}/waldo
 fi
 
@@ -524,7 +527,7 @@ ${WALDO_CLI_BIN}/waldo "$BUILD_PATH" "$SYMBOLS_PATH"
 WALDO_CLI_BIN=/usr/local/bin
 
 if [ ! -e ${WALDO_CLI_BIN}/waldo ]; then
-  curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.1/waldo > ${WALDO_CLI_BIN}/waldo
+  curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.2/waldo > ${WALDO_CLI_BIN}/waldo
   chmod +x ${WALDO_CLI_BIN}/waldo
 fi
 
