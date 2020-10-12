@@ -180,7 +180,12 @@ workflows:
     #...
 ```
 
-> **Note:** The `find_symbols` input is optional but we highly recommend
+> **Note 1:** The value you supply to the `upload_token` input _should_ be
+> specified as a “secret” environment variable by going to the **Secrets** tab
+> in the Bitrise **Workflow Editor** and assigning your upload token to
+> `WALDO_UPLOAD_TOKEN`.
+
+> **Note 2:** The `find_symbols` input is optional but we highly recommend
 > supplying it.
 
 ### Uploading an iOS Device Build
@@ -209,7 +214,12 @@ workflows:
     #...
 ```
 
-> **Note:** The `symbols_path` input is optional but we highly recommend
+> **Note 1:** The value you supply to the `upload_token` input _should_ be
+> specified as a “secret” environment variable by going to the **Secrets** tab
+> in the Bitrise **Workflow Editor** and assigning your upload token to
+> `WALDO_UPLOAD_TOKEN`.
+
+> **Note 2:** The `symbols_path` input is optional but we highly recommend
 > supplying it.
 
 ### Uploading an Android Build
@@ -232,6 +242,11 @@ workflows:
         - upload_token: $WALDO_UPLOAD_TOKEN     # from your secrets
     #...
 ```
+
+> **Note:** The value you supply to the `upload_token` input _should_ be
+> specified as a “secret” environment variable by going to the **Secrets** tab
+> in the Bitrise **Workflow Editor** and assigning your upload token to
+> `WALDO_UPLOAD_TOKEN`.
 
 ----------
 
