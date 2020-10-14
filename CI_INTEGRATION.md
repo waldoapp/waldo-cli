@@ -171,7 +171,9 @@ workflows:
   primary:
     steps:
     #...
-    - xcode-build-for-simulator: {}
+    - xcode-build-for-simulator:
+        inputs:
+        - xcodebuild_options: CODE_SIGNING_ALLOWED=YES
     - waldo-upload:
         inputs:
         - build_path: $BITRISE_APP_DIR_PATH
