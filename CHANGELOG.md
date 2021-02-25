@@ -7,6 +7,13 @@ This project adheres to [Semantic Versioning].
 
 ## [Unreleased]
 
+## [1.6.3] - 2021-02-25
+
+### Added
+
+- Added `sim_build_upload.sh` Bash script to release to help App Center users
+  build for simulator.
+
 ## [1.6.2] - 2020-10-09
 
 ### Changed
@@ -107,8 +114,9 @@ This project adheres to [Semantic Versioning].
 
 Initial public release.
 
-[Unreleased]:   https://github.com/waldoapp/waldo-cli/compare/1.6.2...HEAD
-[Unreleased]:   https://github.com/waldoapp/waldo-cli/compare/1.6.1...1.6.2
+[Unreleased]:   https://github.com/waldoapp/waldo-cli/compare/1.6.3...HEAD
+[1.6.3]:        https://github.com/waldoapp/waldo-cli/compare/1.6.2...1.6.3
+[1.6.2]:        https://github.com/waldoapp/waldo-cli/compare/1.6.1...1.6.2
 [1.6.1]:        https://github.com/waldoapp/waldo-cli/compare/1.6.0...1.6.1
 [1.6.0]:        https://github.com/waldoapp/waldo-cli/compare/1.5.0...1.6.0
 [1.5.0]:        https://github.com/waldoapp/waldo-cli/compare/1.4.2...1.5.0
