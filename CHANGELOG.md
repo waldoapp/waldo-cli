@@ -7,12 +7,25 @@ This project adheres to [Semantic Versioning].
 
 ## [Unreleased]
 
+## [1.6.4] - 2021-03-15
+
+### Added
+
+- Added `SIM_APPCENTER.md` document describing App Center iOS simulator build
+  workaround in great detail.
+
+### Changed
+
+- Replaced `sim_build_upload.sh` with improved
+  `sim_appcenter_build_and_upload.sh` Bash script to help App Center users
+  build for iOS simulator.
+
 ## [1.6.3] - 2021-02-25
 
 ### Added
 
 - Added `sim_build_upload.sh` Bash script to release to help App Center users
-  build for simulator.
+  build for iOS simulator.
 
 ## [1.6.2] - 2020-10-09
 
@@ -114,7 +127,8 @@ This project adheres to [Semantic Versioning].
 
 Initial public release.
 
-[Unreleased]:   https://github.com/waldoapp/waldo-cli/compare/1.6.3...HEAD
+[Unreleased]:   https://github.com/waldoapp/waldo-cli/compare/1.6.4...HEAD
+[1.6.4]:        https://github.com/waldoapp/waldo-cli/compare/1.6.3...1.6.4
 [1.6.3]:        https://github.com/waldoapp/waldo-cli/compare/1.6.2...1.6.3
 [1.6.2]:        https://github.com/waldoapp/waldo-cli/compare/1.6.1...1.6.2
 [1.6.1]:        https://github.com/waldoapp/waldo-cli/compare/1.6.0...1.6.1
