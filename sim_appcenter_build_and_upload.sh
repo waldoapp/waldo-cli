@@ -6,16 +6,20 @@ SIM_XCODE_DATA_PATH=/tmp/${SIM_XCODE_SCHEME}-$(uuidgen)
 WALDO_CLI_BIN=$(unset CDPATH && cd "${0%/*}" &>/dev/null && pwd)
 
 function cancel_appcenter_build() {
-    [[ -n $SIM_APPCENTER_API_TOKEN ]] || return
-    [[ -n $SIM_APPCENTER_APP_NAME ]] || return
-    [[ -n $SIM_APPCENTER_OWNER_NAME ]] || return
+    local _owner_name=${SIM_APPCENTER_OWNER_NAME:-}
+    local _api_token=${SIM_APPCENTER_API_TOKEN:-}
+    local _app_name=${SIM_APPCENTER_APP_NAME:-}
 
-    curl --data "{\"status\":\"cancelling\"}"               \
-         --header 'Content-Type: application/json'          \
-         --header "X-API-Token: $SIM_APPCENTER_API_TOKEN"   \
-         --include                                          \
-         --request PATCH                                    \
-         "https://appcenter.ms/api/v0.1/apps/${SIM_APPCENTER_OWNER_NAME}/${SIM_APPCENTER_APP_NAME}/builds/${APPCENTER_BUILD_ID}"
+    [[ -n $_owner_name ]] || return
+    [[ -n $_api_token ]] || return
+    [[ -n $_app_name ]] || return
+
+    curl --data "{\"status\":\"cancelling\"}"       \
+         --header 'Content-Type: application/json'  \
+         --header "X-API-Token: $_api_token"        \
+         --include                                  \
+         --request PATCH                            \
+         "https://appcenter.ms/api/v0.1/apps/${_owner_name}/${_app_name}/builds/${APPCENTER_BUILD_ID}"
 }
 
 function create_sim_build() {
