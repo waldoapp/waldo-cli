@@ -137,8 +137,8 @@ This project adheres to [Semantic Versioning].
 
 Initial public release.
 
-[Unreleased]:   https://github.com/waldoapp/waldo-cli/compare/1.6.4...HEAD
-[1.6.5]:        https://github.com/waldoapp/waldo-cli/compare/1.6.4...1.6.4
+[Unreleased]:   https://github.com/waldoapp/waldo-cli/compare/1.6.5...HEAD
+[1.6.5]:        https://github.com/waldoapp/waldo-cli/compare/1.6.4...1.6.5
 [1.6.4]:        https://github.com/waldoapp/waldo-cli/compare/1.6.3...1.6.4
 [1.6.3]:        https://github.com/waldoapp/waldo-cli/compare/1.6.2...1.6.3
 [1.6.2]:        https://github.com/waldoapp/waldo-cli/compare/1.6.1...1.6.2
