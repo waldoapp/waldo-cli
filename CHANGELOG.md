@@ -9,9 +9,12 @@ This project adheres to [Semantic Versioning].
 
 ## [1.6.5] - 2021-04-01
 
-### Changed
+### Fixed
 
 - Fixed erroneous `sim_build_upload.sh` Bash script.
+
+### Changed
+
 - Improved `SIM_APPCENTER.md` document.
 
 ## [1.6.4] - 2021-03-15
