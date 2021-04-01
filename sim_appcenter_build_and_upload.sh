@@ -31,14 +31,14 @@ function create_sim_build() {
                    -configuration "$SIM_XCODE_CONFIGURATION"        \
                    -destination 'generic/platform=iOS Simulator'    \
                    -derivedDataPath "$SIM_XCODE_DATA_PATH"          \
-                   clean build || exit
+                   clean build
     else
         xcodebuild -project "$SIM_XCODE_PROJECT"                    \
                    -scheme "$SIM_XCODE_SCHEME"                      \
                    -configuration "$SIM_XCODE_CONFIGURATION"        \
                    -destination 'generic/platform=iOS Simulator'    \
                    -derivedDataPath "$SIM_XCODE_DATA_PATH"          \
-                   clean build || exit
+                   clean build
     fi
 }
 

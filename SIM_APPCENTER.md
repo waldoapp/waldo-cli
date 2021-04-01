@@ -1,14 +1,13 @@
 # Uploading an iOS Simulator Build with App Center
 
 As mentioned in the [CI Integration](CI_INTEGRATION.md) document, uploading an
-iOS simulator build is not officially supported in [App
-Center](https://appcenter.ms). However, we have found a usable workaround that
-accomplishes just that. Multiple Waldo customers have implemented this solution
-until such time as App Center provides official support for simulator builds.
+iOS simulator build is not officially supported in [App Center]. However, we
+have found a usable workaround that accomplishes just that. Multiple Waldo
+customers have implemented this solution until such time as App Center provides
+official support for simulator builds.
 
 This solution “piggybacks” a simulator build on top of a regular device build.
-It requires you only to add a couple of [custom build
-steps](https://docs.microsoft.com/en-us/appcenter/build/custom/scripts/).
+It requires you only to add a couple of [custom build scripts][build_scripts].
 
 ## Step 1
 
@@ -16,7 +15,7 @@ First, add the following to `appcenter-post-clone.sh`:
 
 ```bash
 WALDO_CLI_BIN=/usr/local/bin
-WALDO_CLI_URL=https://github.com/waldoapp/waldo-cli/releases/download/1.6.4
+WALDO_CLI_URL=https://github.com/waldoapp/waldo-cli/releases/download/1.6.5
 
 curl -fLs ${WALDO_CLI_URL}/waldo > ${WALDO_CLI_BIN}/waldo
 chmod +x ${WALDO_CLI_BIN}/waldo
@@ -26,7 +25,7 @@ chmod +x ${WALDO_CLI_BIN}/sim_appcenter_build_and_upload.sh
 ```
 
 > **Note:** This downloads a _second_ script that you can find in
-> https://github.com/waldoapp/waldo-cli/releases/download/1.6.4/sim_appcenter_build_and_upload.sh,
+> https://github.com/waldoapp/waldo-cli/releases/download/1.6.5/sim_appcenter_build_and_upload.sh,
 > in addition to `waldo`.
 
 ## Step 2
@@ -53,7 +52,7 @@ export WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
 # export SIM_APPCENTER_OWNER_NAME="Owner Name"
 # export SIM_APPCENTER_APP_NAME=YourApp
 
-${WALDO_CLI_BIN}/sim_appcenter_build_and_upload.sh
+${WALDO_CLI_BIN}/sim_appcenter_build_and_upload.sh || exit
 
 #
 # Uncomment the following “exit” line to disable the device build operation
@@ -76,14 +75,15 @@ _cancel_ the App Center build _after_ the simulator build uploads to Waldo, but
 _before_ the regular (and expensive) device build operation starts. If you
 choose to _not_ set these environment variables, the simulator build will still
 upload the simulator build to Waldo. What happens afterward depends on whether
-you explicitly exit the pre-build script with success (`0`) or failure (`1`).
+you explicitly exit the pre-build script with success (`0`) or failure (_not_
+`0`).
 
 Thus, there are three options you can choose for the pre-build script:
 
-1. **normal** (default) — Leave the `SIM_APPCENTER_*` environment variables and
-   the `exit` line commented out. This will upload a simulator build of your
-   app to Waldo and then proceed to build it for device, too. If you have also
-   created a post-build script (as described in the [CI
+1. **normal** _(default)_ — Leave the `SIM_APPCENTER_*` environment variables
+   and the `exit` line commented out. This will upload a simulator build of
+   your app to Waldo and then proceed to build it for device, too. If you have
+   also created a post-build script (as described in the [CI
    Integration](CI_INTEGRATION.md) document), the device build will be uploaded
    to Waldo as well. The entire build will display as `Succeeded` in the App
    Center dashboard.
@@ -93,11 +93,40 @@ Thus, there are three options you can choose for the pre-build script:
    simulator build of your app to Waldo and then _cancel_ the device build. The
    entire build will display as `Canceled` in the App Center dashboard.
 
+   The `sim_appcenter_build_and_upload.sh` script calls an App Center API
+   endpoint to cancel the device build. Therefore, you _must_ define the
+   following environment variables correctly in order to cancel the device
+   build:
+
+   - `SIM_APPCENTER_API_TOKEN` — This must be set to a valid API token: either
+     a user token or an app token.
+
+     See [Creating an App Center App API token][app_api_token] or [Creating an
+     App Center User API token][user_api_token] for details.
+
+   - `SIM_APPCENTER_APP_NAME` — This must be set to the name of your app.
+
+     See [Find owner_name and app_name from an App Center URL][owner_app_names]
+     for details.
+
+   - `SIM_APPCENTER_OWNER_NAME` — This must be set to name of the _owner_ of
+     your app.
+
+     See [Find owner_name and app_name from an App Center URL][owner_app_names]
+     for details.
+
 3. **failure** — Uncomment the `exit` line (leave the `SIM_APPCENTER_*`
    environment variables commented out). This will upload a simulator build of
    your app to Waldo and then _fail_ the device build. The
    entire build will display as `Failed` in the App Center dashboard.
 
-We recommend that you choose option 2 unless you actually desire the device
-build operation to be run. In this way, the build displays a `Canceled` status
-and thereby reserves the `Failed` status for true build failures.
+We _strongly_ recommend that you choose option 2 unless you actually desire the
+device build operation to be run. In this way, the build displays a `Canceled`
+status and thereby reserves the `Failed` status for true build failures.
+
+[App Center]:   https://appcenter.ms
+
+[app_api_token]:    https://docs.microsoft.com/en-us/appcenter/api-docs/#creating-an-app-center-app-api-token
+[build_scripts]:    https://docs.microsoft.com/en-us/appcenter/build/custom/scripts/
+[owner_app_names]:  https://docs.microsoft.com/en-us/appcenter/api-docs/#find-owner_name-and-app_name-from-an-app-center-url
+[user_api_token]:   https://docs.microsoft.com/en-us/appcenter/api-docs/#creating-an-app-center-user-api-token

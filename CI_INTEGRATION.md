@@ -2,8 +2,8 @@
 
 ## Uploading a Build with fastlane
 
-Waldo integration with [fastlane](https://fastlane.tools) requires you only to
-add the `waldo` plugin to your project:
+Waldo integration with [fastlane] requires you only to add the `waldo` plugin
+to your project:
 
 ```bash
 $ fastlane add_plugin waldo
@@ -99,9 +99,8 @@ waldo(upload_token: '0123456789abcdef0123456789abcdef',
 
 ## Uploading a Build with App Center
 
-Waldo integration with [App Center](https://appcenter.ms) requires you only to
-add a couple of [custom build
-steps](https://docs.microsoft.com/en-us/appcenter/build/custom/scripts/).
+Waldo integration with [App Center] requires you only to add a couple of
+[custom build scripts][ac_scripts].
 
 In all cases, add the following to `appcenter-post-clone.sh`:
 
@@ -155,19 +154,15 @@ ${WALDO_CLI_BIN}/waldo "$BUILD_PATH"
 
 ## Uploading a Build with Bitrise
 
-Waldo integration with [Bitrise](https://www.bitrise.io) requires you only to
-add a [`Waldo Upload`](https://app.bitrise.io/integrations/steps/waldo-upload)
-step to your workflow.
+Waldo integration with [Bitrise] requires you only to add a [`Waldo
+Upload`][br_waldo_upload] step to your workflow.
 
 ### Uploading an iOS Simulator Build
 
 First, create a new simulator build for your app. When you use the [`Xcode
-build for
-simulator`](https://app.bitrise.io/integrations/steps/xcode-build-for-simulator
-) step to build your app, output variables are generated that you can then use
-as input to the [`Waldo
-Upload`](https://app.bitrise.io/integrations/steps/waldo-upload) step to find
-and upload the generated app.
+build for simulator`][br_xcode_build] step to build your app, output variables
+are generated that you can then use as input to the [`Waldo
+Upload`][br_waldo_upload] step to find and upload the generated app.
 
 ```yaml
 workflows:
@@ -196,10 +191,9 @@ workflows:
 ### Uploading an iOS Device Build
 
 First, build a new IPA for your app. When you use the [`Xcode Archive & Export
-for iOS`](https://app.bitrise.io/integrations/steps/xcode-archive) step to
-build your IPA, output variables are generated that you can then use as input
-to the [`Waldo Upload`](https://app.bitrise.io/integrations/steps/waldo-upload)
-step to find and upload the generated IPA.
+for iOS`][br_xcode_archive] step to build your IPA, output variables are
+generated that you can then use as input to the [`Waldo
+Upload`][br_waldo_upload] step to find and upload the generated IPA.
 
 ```yaml
 workflows:
@@ -230,10 +224,9 @@ workflows:
 ### Uploading an Android Build
 
 First, build a new APK for your app. When you use the [`Android
-Build`](https://app.bitrise.io/integrations/steps/android-build) step to build
-your APK, output variables are generated that you can then use as input to the
-[`Waldo Upload`](https://app.bitrise.io/integrations/steps/waldo-upload) step
-to find and upload the generated APK.
+Build`][br_android_build] step to build your APK, output variables are
+generated that you can then use as input to the [`Waldo
+Upload`][br_waldo_upload] step to find and upload the generated APK.
 
 ```yaml
 workflows:
@@ -257,9 +250,8 @@ workflows:
 
 ## Uploading a Build with buddybuild
 
-Waldo integration with [buddybuild](https://www.buddybuild.com) requires you
-only to add a couple of [custom build
-steps](https://docs.buddybuild.com/builds/custom_build_steps.html).
+Waldo integration with [buddybuild] requires you only to add a couple of
+[custom build steps][bb_custom].
 
 In all cases, add the following to `buddybuild_postclone.sh`:
 
@@ -319,9 +311,8 @@ _Not supported by the CI._
 
 ### Uploading an iOS Simulator Build
 
-Waldo integration with [CircleCI](https://circleci.com) requires you only to
-add a couple of steps to your
-[configuration](https://circleci.com/docs/2.0/configuration-reference/):
+Waldo integration with [CircleCI] requires you only to add a couple of steps to
+your [configuration][cc_config]:
 
 ```yaml
 jobs:
@@ -352,9 +343,8 @@ jobs:
 
 ### Uploading an iOS Device Build
 
-Waldo integration with [CircleCI](https://circleci.com) requires you only to
-add a couple of steps to your
-[configuration](https://circleci.com/docs/2.0/configuration-reference/):
+Waldo integration with [CircleCI] requires you only to add a couple of steps to
+your [configuration][cc_config]:
 
 ```yaml
 jobs:
@@ -386,9 +376,8 @@ jobs:
 
 ### Uploading an Android Build
 
-Waldo integration with [CircleCI](https://circleci.com) requires you only to
-add a couple of steps to your
-[configuration](https://circleci.com/docs/2.0/configuration-reference/):
+Waldo integration with [CircleCI] requires you only to add a couple of steps to
+your [configuration][cc_config]:
 
 ```yaml
 jobs:
@@ -420,8 +409,8 @@ jobs:
 
 ### Uploading an iOS Simulator Build
 
-Waldo integration with [Travis CI](https://travis-ci.com) requires you only to
-add a few steps to your [.travis.yml](https://docs.travis-ci.com):
+Waldo integration with [Travis CI] requires you only to add a few steps to your
+[.travis.yml][tc_docs]:
 
 ```yaml
 env:
@@ -447,8 +436,8 @@ script:
 
 ### Uploading an iOS Device Build
 
-Waldo integration with [Travis CI](https://travis-ci.com) requires you only to
-add a few steps to your [.travis.yml](https://docs.travis-ci.com):
+Waldo integration with [Travis CI] requires you only to add a few steps to your
+[.travis.yml][tc_docs]:
 
 ```yaml
 env:
@@ -476,8 +465,8 @@ script:
 
 ### Uploading an Android Build
 
-Waldo integration with [Travis CI](https://travis-ci.com) requires you only to
-add a few steps to your [.travis.yml](https://docs.travis-ci.com):
+Waldo integration with [Travis CI] requires you only to add a few steps to your
+[.travis.yml][tc_docs]:
 
 ```yaml
 env:
@@ -574,3 +563,19 @@ BUILD_PATH=/path/to/YourApp.apk
 
 ${WALDO_CLI_BIN}/waldo "$BUILD_PATH"
 ```
+
+[App Center]:   https://appcenter.ms
+[Bitrise]:      https://www.bitrise.io
+[buddybuild]:   https://www.buddybuild.com
+[CircleCI]:     https://circleci.com
+[fastlane]:     https://fastlane.tools
+[Travis CI]:    https://travis-ci.com
+
+[ac_scripts]:       https://docs.microsoft.com/en-us/appcenter/build/custom/scripts/
+[bb_custom]:        https://docs.buddybuild.com/builds/custom_build_steps.html
+[br_android_build]: https://app.bitrise.io/integrations/steps/android-build
+[br_waldo_upload]:  https://app.bitrise.io/integrations/steps/waldo-upload
+[br_xcode_archive]: https://app.bitrise.io/integrations/steps/xcode-archive
+[br_xcode_build]:   https://app.bitrise.io/integrations/steps/xcode-build-for-simulator
+[cc_config]:        https://circleci.com/docs/2.0/configuration-reference/
+[tc_docs]:          https://docs.travis-ci.com
