@@ -7,7 +7,7 @@ waldo_api_error_endpoint=${WALDO_API_ERROR_ENDPOINT:-https://api.waldo.io/upload
 waldo_api_symbols_endpoint=${WALDO_API_SYMBOLS_ENDPOINT:-https://api.waldo.io/versions/__ID__/symbols}
 waldo_user_agent_override=${WALDO_USER_AGENT_OVERRIDE:-}
 
-waldo_cli_version="1.6.2"
+waldo_cli_version="1.7.0"
 
 waldo_build_flavor=""
 waldo_build_path=""
@@ -15,6 +15,7 @@ waldo_build_payload_path=""
 waldo_build_suffix=""
 waldo_build_upload_id=""
 waldo_extra_args="--show-error --silent"
+waldo_git_sha=""
 waldo_history=""
 waldo_history_error=""
 waldo_include_symbols=false
@@ -81,6 +82,10 @@ function check_build_status() {
     if [[ $_response =~ $_id_regex ]]; then
         waldo_build_upload_id=${BASH_REMATCH[1]}
     fi
+}
+
+function check_git_sha() {
+    [[ -n $waldo_git_sha ]] || waldo_git_sha=$(get_default_git_sha)
 }
 
 function check_history() {
@@ -337,6 +342,7 @@ function display_summary() {
     echo "Symbols path: $(summarize "$waldo_symbols_path")"
     echo "Variant name: $(summarize "$waldo_variant_name")"
     echo "Upload token: $(summarize_secure "$waldo_upload_token")"
+    echo "Git SHA:      $(summarize "$waldo_git_sha")"
     echo ""
 
     if [[ $waldo_extra_args == "--verbose" ]]; then
@@ -356,6 +362,7 @@ USAGE: waldo [options] <build-path> [<symbols-path>]
 OPTIONS:
 
   --help                  Display available options
+  --git_sha <value>       Associate the provided git (SHA-1) hash with the build
   --include_symbols       Include symbols with the build upload
   --upload_token <value>  Waldo upload token (overrides WALDO_UPLOAD_TOKEN)
   --variant_name <value>  Waldo variant name (overrides WALDO_VARIANT_NAME)
@@ -428,6 +435,18 @@ function get_ci() {
         echo "Travis CI"
     else
         echo "CLI"
+    fi
+}
+
+function get_default_git_sha() {
+    if [[ -n ${$BITRISE_GIT_COMMIT:-} ]]; then
+        echo $BITRISE_GIT_COMMIT
+    elif [[ -n ${CIRCLE_SHA1:-} ]]; then
+        echo $CIRCLE_SHA1
+    elif [[ -n ${TRAVIS_PULL_REQUEST_SHA:-} ]]; then
+        echo $TRAVIS_PULL_REQUEST_SHA
+    elif [[ -n ${TRAVIS_COMMIT:-} ]]; then
+        echo $TRAVIS_COMMIT
     fi
 }
 
@@ -589,6 +608,15 @@ display_version
 
 while (( $# )); do
     case $1 in
+        --git_sha)
+            if (( $# < 2 )) || [[ -z $2 || ${2:0:1} == "-" ]]; then
+                fail_usage "Missing required value for option: ‘${1}’"
+            else
+                waldo_git_sha=$2
+                shift
+            fi
+            ;;
+
         --help)
             display_usage
             exit
@@ -641,6 +669,7 @@ done
 check_platform || exit
 check_build_path || exit
 check_symbols_path || exit
+check_git_sha || exit
 check_history || exit
 check_upload_token || exit
 check_variant_name || exit
