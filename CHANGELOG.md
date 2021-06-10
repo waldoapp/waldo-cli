@@ -7,6 +7,21 @@ This project adheres to [Semantic Versioning].
 
 ## [Unreleased]
 
+## [1.6.6] - 2021-06-10
+
+### Added
+
+- Added detection and reporting of active GitHub Actions CI.
+
+### Changed
+
+- Updated `CI_INTEGRATION.md` document to cover GitHub Actions.
+
+### Fixed
+
+- Fixed erroneous reporting of the git SHA from a GitHub Actions workflow when
+  merging via pull request.
+
 ## [1.6.5] - 2021-04-01
 
 ### Fixed
@@ -137,7 +152,8 @@ This project adheres to [Semantic Versioning].
 
 Initial public release.
 
-[Unreleased]:   https://github.com/waldoapp/waldo-cli/compare/1.6.5...HEAD
+[Unreleased]:   https://github.com/waldoapp/waldo-cli/compare/1.6.6...HEAD
+[1.6.6]:        https://github.com/waldoapp/waldo-cli/compare/1.6.5...1.6.6
 [1.6.5]:        https://github.com/waldoapp/waldo-cli/compare/1.6.4...1.6.5
 [1.6.4]:        https://github.com/waldoapp/waldo-cli/compare/1.6.3...1.6.4
 [1.6.3]:        https://github.com/waldoapp/waldo-cli/compare/1.6.2...1.6.3

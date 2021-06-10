@@ -7,7 +7,7 @@ waldo_api_error_endpoint=${WALDO_API_ERROR_ENDPOINT:-https://api.waldo.io/upload
 waldo_api_symbols_endpoint=${WALDO_API_SYMBOLS_ENDPOINT:-https://api.waldo.io/versions/__ID__/symbols}
 waldo_user_agent_override=${WALDO_USER_AGENT_OVERRIDE:-}
 
-waldo_cli_version="1.6.2"
+waldo_cli_version="1.6.6"
 
 waldo_build_flavor=""
 waldo_build_path=""
@@ -90,8 +90,10 @@ function check_history() {
         waldo_history_error="noGitCommandFound"
     elif [[ -z $(which grep) ]]; then
         waldo_history_error="noGrepCommandFound"
+    elif [[ -z $(which sed) ]]; then
+        waldo_history_error="noSedCommandFound"
     elif [[ -z $(which tr) ]]; then
-        waldo_history_error="noTr64CommandFound"
+        waldo_history_error="noTrCommandFound"
     elif ! git rev-parse >& /dev/null; then
         waldo_history_error="notGitRepository"
     else
@@ -424,6 +426,8 @@ function get_ci() {
         echo "buddybuild"
     elif [[ ${CIRCLECI:-false} == true ]]; then
         echo "CircleCI"
+    elif [[ ${GITHUB_ACTIONS:-false} == true ]]; then
+        echo "GitHub Actions"
     elif [[ ${TRAVIS:-false} == true ]]; then
         echo "Travis CI"
     else
@@ -436,7 +440,7 @@ function get_error_content_type() {
 }
 
 function get_history() {
-    local _shas=$(git log --format='%H' -50)
+    local _shas=$(git log --format='%H' --skip=$(get_skip_count) -50)
     local _history=$(convert_shas $_shas)
 
     echo "[${_history}]" | websafe_base64_encode
@@ -449,6 +453,14 @@ function get_platform() {
         Darwin) echo "macOS" ;;
         *)      echo "$_os_name" ;;
     esac
+}
+
+function get_skip_count() {
+    if [[ ${GITHUB_ACTIONS:-false} == true && ${GITHUB_EVENT_NAME:-} == "pull_request" ]]; then
+        echo "1"
+    else
+        echo "0"
+    fi
 }
 
 function get_symbols_content_type() {
@@ -582,7 +594,7 @@ function upload_symbols() {
 }
 
 function websafe_base64_encode() {
-    base64 | tr -d '=\n' | tr '/+' '_-'
+    base64 | tr -d '\n' | tr '/+' '_-' | sed 's/=/%3D/g'
 }
 
 display_version

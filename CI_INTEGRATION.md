@@ -139,7 +139,7 @@ In all cases, add the following to `appcenter-post-clone.sh`:
 
 ```bash
 WALDO_CLI_BIN=/usr/local/bin
-WALDO_CLI_URL=https://github.com/waldoapp/waldo-cli/releases/download/1.6.5
+WALDO_CLI_URL=https://github.com/waldoapp/waldo-cli/releases/download/1.6.6
 
 curl -fLs ${WALDO_CLI_URL}/waldo > ${WALDO_CLI_BIN}/waldo
 chmod +x ${WALDO_CLI_BIN}/waldo
@@ -290,7 +290,7 @@ In all cases, add the following to `buddybuild_postclone.sh`:
 
 ```bash
 WALDO_CLI_BIN=/usr/local/bin
-WALDO_CLI_URL=https://github.com/waldoapp/waldo-cli/releases/download/1.6.5
+WALDO_CLI_URL=https://github.com/waldoapp/waldo-cli/releases/download/1.6.6
 
 curl -fLs ${WALDO_CLI_URL}/waldo > ${WALDO_CLI_BIN}/waldo
 chmod +x ${WALDO_CLI_BIN}/waldo
@@ -357,7 +357,7 @@ jobs:
           curl -fLs ${WALDO_CLI_URL}/waldo > .circleci/waldo
           chmod +x .circleci/waldo
         environment:
-          WALDO_CLI_URL: https://github.com/waldoapp/waldo-cli/releases/download/1.6.5
+          WALDO_CLI_URL: https://github.com/waldoapp/waldo-cli/releases/download/1.6.6
 
       #...
       #... (generate .app and associated .dSYM)
@@ -389,7 +389,7 @@ jobs:
           curl -fLs ${WALDO_CLI_URL}/waldo > .circleci/waldo
           chmod +x .circleci/waldo
         environment:
-          WALDO_CLI_URL: https://github.com/waldoapp/waldo-cli/releases/download/1.6.5
+          WALDO_CLI_URL: https://github.com/waldoapp/waldo-cli/releases/download/1.6.6
 
       #...
       #... (generate .ipa and associated .dSYM)
@@ -422,7 +422,7 @@ jobs:
           curl -fLs ${WALDO_CLI_URL}/waldo > .circleci/waldo
           chmod +x .circleci/waldo
         environment:
-          WALDO_CLI_URL: https://github.com/waldoapp/waldo-cli/releases/download/1.6.5
+          WALDO_CLI_URL: https://github.com/waldoapp/waldo-cli/releases/download/1.6.6
 
       #...
       #... (generate .apk)
@@ -460,7 +460,7 @@ jobs:
           WALDO_UPLOAD_TOKEN: 0123456789abcdef0123456789abcdef
         run: |
           if [ ! -e ${WALDO_CLI_BIN}/waldo ]; then
-            curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.5/waldo > ${WALDO_CLI_BIN}/waldo
+            curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.6/waldo > ${WALDO_CLI_BIN}/waldo
             chmod +x ${WALDO_CLI_BIN}/waldo
           fi
 
@@ -491,7 +491,7 @@ jobs:
           WALDO_UPLOAD_TOKEN: 0123456789abcdef0123456789abcdef
         run: |
           if [ ! -e ${WALDO_CLI_BIN}/waldo ]; then
-            curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.5/waldo > ${WALDO_CLI_BIN}/waldo
+            curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.6/waldo > ${WALDO_CLI_BIN}/waldo
             chmod +x ${WALDO_CLI_BIN}/waldo
           fi
 
@@ -521,7 +521,7 @@ jobs:
           WALDO_UPLOAD_TOKEN: 0123456789abcdef0123456789abcdef
         run: |
           if [ ! -e ${WALDO_CLI_BIN}/waldo ]; then
-            curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.5/waldo > ${WALDO_CLI_BIN}/waldo
+            curl -fLs https://github.com/waldoapp/waldo-cli/releases/download/1.6.6/waldo > ${WALDO_CLI_BIN}/waldo
             chmod +x ${WALDO_CLI_BIN}/waldo
           fi
 
@@ -541,7 +541,7 @@ Waldo integration with [Travis CI] requires you only to add a few steps to your
 env:
   global:
     - WALDO_CLI_BIN=/usr/local/bin
-    - WALDO_CLI_URL=https://github.com/waldoapp/waldo-cli/releases/download/1.6.5
+    - WALDO_CLI_URL=https://github.com/waldoapp/waldo-cli/releases/download/1.6.6
     - WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
 install:
   - curl -fLs ${WALDO_CLI_URL}/waldo > ${WALDO_CLI_BIN}/waldo
@@ -568,7 +568,7 @@ Waldo integration with [Travis CI] requires you only to add a few steps to your
 env:
   global:
     - WALDO_CLI_BIN=/usr/local/bin
-    - WALDO_CLI_URL=https://github.com/waldoapp/waldo-cli/releases/download/1.6.5
+    - WALDO_CLI_URL=https://github.com/waldoapp/waldo-cli/releases/download/1.6.6
     - WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
 install:
   - curl -fLs ${WALDO_CLI_URL}/waldo > ${WALDO_CLI_BIN}/waldo
@@ -597,7 +597,7 @@ Waldo integration with [Travis CI] requires you only to add a few steps to your
 env:
   global:
     - WALDO_CLI_BIN=/usr/local/bin
-    - WALDO_CLI_URL=https://github.com/waldoapp/waldo-cli/releases/download/1.6.5
+    - WALDO_CLI_URL=https://github.com/waldoapp/waldo-cli/releases/download/1.6.6
     - WALDO_UPLOAD_TOKEN=0123456789abcdef0123456789abcdef
 install:
   - curl -fLs ${WALDO_CLI_URL}/waldo > ${WALDO_CLI_BIN}/waldo
@@ -622,7 +622,7 @@ upload your iOS build manually using Waldo CLI.
 WALDO_CLI_BIN=/usr/local/bin
 
 if [ ! -e ${WALDO_CLI_BIN}/waldo ]; then
-  WALDO_CLI_URL=https://github.com/waldoapp/waldo-cli/releases/download/1.6.5
+  WALDO_CLI_URL=https://github.com/waldoapp/waldo-cli/releases/download/1.6.6
   curl -fLs ${WALDO_CLI_URL}/waldo > ${WALDO_CLI_BIN}/waldo
   chmod +x ${WALDO_CLI_BIN}/waldo
 fi
@@ -647,7 +647,7 @@ ${WALDO_CLI_BIN}/waldo "$BUILD_PATH" --include-symbols
 WALDO_CLI_BIN=/usr/local/bin
 
 if [ ! -e ${WALDO_CLI_BIN}/waldo ]; then
-  WALDO_CLI_URL=https://github.com/waldoapp/waldo-cli/releases/download/1.6.5
+  WALDO_CLI_URL=https://github.com/waldoapp/waldo-cli/releases/download/1.6.6
   curl -fLs ${WALDO_CLI_URL}/waldo > ${WALDO_CLI_BIN}/waldo
   chmod +x ${WALDO_CLI_BIN}/waldo
 fi
@@ -673,7 +673,7 @@ ${WALDO_CLI_BIN}/waldo "$BUILD_PATH" "$SYMBOLS_PATH"
 WALDO_CLI_BIN=/usr/local/bin
 
 if [ ! -e ${WALDO_CLI_BIN}/waldo ]; then
-  WALDO_CLI_URL=https://github.com/waldoapp/waldo-cli/releases/download/1.6.5
+  WALDO_CLI_URL=https://github.com/waldoapp/waldo-cli/releases/download/1.6.6
   curl -fLs ${WALDO_CLI_URL}/waldo > ${WALDO_CLI_BIN}/waldo
   chmod +x ${WALDO_CLI_BIN}/waldo
 fi
