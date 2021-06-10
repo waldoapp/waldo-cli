@@ -15,7 +15,7 @@ First, add the following to `appcenter-post-clone.sh`:
 
 ```bash
 WALDO_CLI_BIN=/usr/local/bin
-WALDO_CLI_URL=https://github.com/waldoapp/waldo-cli/releases/download/1.6.5
+WALDO_CLI_URL=https://github.com/waldoapp/waldo-cli/releases/download/1.6.6
 
 curl -fLs ${WALDO_CLI_URL}/waldo > ${WALDO_CLI_BIN}/waldo
 chmod +x ${WALDO_CLI_BIN}/waldo
@@ -25,7 +25,7 @@ chmod +x ${WALDO_CLI_BIN}/sim_appcenter_build_and_upload.sh
 ```
 
 > **Note:** This downloads a _second_ script that you can find in
-> https://github.com/waldoapp/waldo-cli/releases/download/1.6.5/sim_appcenter_build_and_upload.sh,
+> https://github.com/waldoapp/waldo-cli/releases/download/1.6.6/sim_appcenter_build_and_upload.sh,
 > in addition to `waldo`.
 
 ## Step 2
